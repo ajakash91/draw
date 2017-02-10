@@ -1,4 +1,4 @@
-require 'mobdebug'.start()
+--require 'mobdebug'.start()
 
 require 'nn'
 require 'nngraph'
@@ -38,7 +38,7 @@ x_error_prev = nn.Identity()()
 --read
 h_dec_prev = nn.Identity()()
 gx = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
-gx = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
+--gx = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
 gy = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
 delta = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
 gamma = duplicate(nn.Linear(rnn_size, 1)(h_dec_prev))
@@ -157,7 +157,7 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 -- write layer
 gx = duplicate(nn.Linear(rnn_size, 1)(next_h))
-gx = duplicate(nn.Linear(rnn_size, 1)(next_h))
+--gx = duplicate(nn.Linear(rnn_size, 1)(next_h))
 gy = duplicate(nn.Linear(rnn_size, 1)(next_h))
 delta = duplicate(nn.Linear(rnn_size, 1)(next_h))
 gamma = duplicate(nn.Linear(rnn_size, 1)(next_h))
