@@ -6,9 +6,12 @@ require 'optim'
 require 'image'
 local model_utils=require 'model_utils'
 local mnist = require 'mnist'
+require 'cutorch'
+require 'cunn'
 
 nngraph.setDebug(true)
 
+Tensor = torch.CudaTensor
 
 n_features = 28 * 28
 n_z = 20
@@ -55,6 +58,7 @@ gy = nn.MulConstant((A + 1) / 2)(gy)
 delta = nn.MulConstant((math.max(A,A)-1)/(N-1))(delta)
 
 ascending = nn.Identity()()
+--ascending = ascending:cuda()
 
 function genr_filters(g)
   filters = {}
@@ -68,7 +72,8 @@ function genr_filters(g)
       exp_i = nn.View(n_data, 1, A)(exp_i)
       filters[#filters + 1] = nn.CMulTable()({exp_i, gamma})
   end
-  filterbank = nn.JoinTable(2)(filters)
+  filterbank = nn.JoinTable(2)(filters) 
+--  filterbank = filterbank:cuda()
   return filterbank
 end
 
@@ -123,6 +128,7 @@ loss_z = nn.AddConstant(-1)(loss_z)
 loss_z = nn.MulConstant(0.5)(loss_z)
 loss_z = nn.Sum(2)(loss_z)
 encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e, h_dec_prev, ascending}, {z, loss_z, next_c, next_h, patch})
+encoder = encoder:cuda()
 encoder.name = 'encoder'
 
 
@@ -214,6 +220,7 @@ x_prediction = nn.Reshape(28, 28)(mu)
 x_error = nn.Reshape(28, 28)(d)
 
 decoder = nn.gModule({x, z, prev_c, prev_h, prev_canvas, ascending}, {x_prediction, x_error, next_c, next_h, next_canvas, loss_x})
+decoder = decoder:cuda()
 decoder.name = 'decoder'
 
 
@@ -253,6 +260,8 @@ function feval(x_arg)
     lstm_h_enc = {[0]=torch.zeros(n_data, rnn_size)}
     lstm_c_dec = {[0]=torch.zeros(n_data, rnn_size)}
     lstm_h_dec = {[0]=torch.zeros(n_data, rnn_size)}
+	
+
     x_error = {[0]=torch.rand(n_data, 28, 28)}
     x_prediction = {}
     loss_z = {}
@@ -261,13 +270,28 @@ function feval(x_arg)
     x = {}
     patch = {}
     
-    
+	--lstm_h_enc = lstm_h_enc:cuda()
+	--lstm_c_enc = lstm_c_enc:cuda()    
+	--lstm_h_dec = lstm_h_dec:cuda()
+	--lstm_c_dec = lstm_c_dec:cuda()    
+	--x_error = w_error:cuda()
+	--canvas = canvas:cuda()
+
     local loss = 0
 
     for t = 1, seq_length do
-      e[t] = torch.randn(n_data, n_z)
-      x[t] = features_input
-      z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t], patch[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t], lstm_h_dec[t-1], ascending}))
+      e[t] = torch.randn(n_data, n_z):cuda()
+      x[t] = features_input:cuda()
+
+	  lstm_h_enc[t-1] = lstm_h_enc[t-1]:cuda()
+	  lstm_c_enc[t-1] = lstm_c_enc[t-1]:cuda()
+      lstm_h_dec[t-1] = lstm_h_dec[t-1]:cuda()
+	  lstm_c_dec[t-1] = lstm_c_dec[t-1]:cuda()
+	  x_error[t-1] = x_error[t-1]:cuda()
+	  canvas[t-1] = canvas[t-1]:cuda()
+	  ascending = ascending:cuda()
+
+	  z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t], patch[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t], lstm_h_dec[t-1], ascending}))
       x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1], ascending}))
       --print(patch[1]:gt(0.5))
       
@@ -296,10 +320,23 @@ function feval(x_arg)
     dpatch = {}
     
     for t = seq_length,1,-1 do
-      dloss_x[t] = torch.ones(n_data, 1)
-      dloss_z[t] = torch.ones(n_data, 1)
-      dx_prediction[t] = torch.zeros(n_data, 28, 28)
-      dpatch[t] = torch.zeros(n_data, N, N)
+      dloss_x[t] = torch.ones(n_data, 1):cuda()
+      dloss_z[t] = torch.ones(n_data, 1):cuda()
+      dx_prediction[t] = torch.zeros(n_data, 28, 28):cuda()
+      dpatch[t] = torch.zeros(n_data, N, N):cuda()
+
+	  --dx1[t] = dx1[t]:cuda()
+	  --dz[t] = dz[t]:cuda()
+	  dx_error[t] = dx_error[t]:cuda()
+	  dlstm_c_dec[t] = dlstm_c_dec[t]:cuda()
+	  dlstm_h_dec[t] = dlstm_h_dec[t]:cuda()
+	  dcanvas[t] = dcanvas[t]:cuda()
+	  
+  	  dlstm_c_enc[t] = dlstm_c_enc[t]:cuda()
+  	  dlstm_h_enc[t] = dlstm_h_enc[t]:cuda()
+  	  --dlstm_h_dec1[t-1] = dlstm_h_dec1[t-1]:cuda()
+   	  --dlstm_h_dec2[t-1] = dlstm_h_dec2[t-1]:cuda()
+  	  	  
       dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec1[t-1], dcanvas[t-1], dascending1 = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dx_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t], dloss_x[t]}))
       dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t], dlstm_h_dec2[t-1], dascending2 = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t], lstm_h_dec[t-1], ascending}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t], dpatch[t]}))
       dlstm_h_dec[t-1] = dlstm_h_dec1[t-1] + dlstm_h_dec2[t-1]
@@ -342,9 +379,9 @@ torch.save('x_prediction', x_prediction)
 
 --generation
 for t = 1, seq_length do
-      e[t] = torch.randn(n_data, n_z)
-      x[t] = features_input
-      z[t] = torch.randn(n_data, n_z)
+      e[t] = torch.randn(n_data, n_z):cuda()
+      x[t] = features_input:cuda()
+      z[t] = torch.randn(n_data, n_z):cuda()
       x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1], ascending}))
   end
 
