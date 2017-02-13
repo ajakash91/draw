@@ -7,21 +7,21 @@ require 'image'
 local model_utils=require 'model_utils'
 local mnist = require 'mnist'
 require 'cutorch'
---require 'cunn'
+require 'cunn'
 
 nngraph.setDebug(true)
 
-Tensor = torch.CudaTensor
+--Tensor = torch.CudaTensor
 
 n_features = 28 * 28
-n_z = 20
-rnn_size = 100
+n_z = 20			--20
+rnn_size = 100		--100
 n_canvas = 28 * 28
-seq_length = 50
+seq_length = 50		--50
 
 N = 3
 A = 28
-n_data = 20
+n_data = 20		--20
 
 function duplicate(x)
   local y = nn.Reshape(1)(x)
