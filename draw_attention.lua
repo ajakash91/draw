@@ -7,7 +7,7 @@ require 'image'
 local model_utils=require 'model_utils'
 local mnist = require 'mnist'
 require 'cutorch'
-require 'cunn'
+--require 'cunn'
 
 nngraph.setDebug(true)
 
