@@ -10,7 +10,8 @@ local mnist = require 'mnist'
 nngraph.setDebug(true)
 
 x_prediction = torch.load('x_prediction')
---x_prediction = x_prediction:cuda()
+--x_prediction = torch.load('x_generation')
+
 x = torch.zeros(#x_prediction, x_prediction[1]:size(2), x_prediction[1]:size(3)) 
 x = x:cuda()
 for i = 1, x_prediction[1]:size(1) do
@@ -21,4 +22,3 @@ for i = 1, x_prediction[1]:size(1) do
   end
   image.display(x)
 end
-

@@ -9,19 +9,19 @@ local mnist = require 'mnist'
 require 'cutorch'
 require 'cunn'
 
-nngraph.setDebug(true)
+--nngraph.setDebug(true)
 
---Tensor = torch.CudaTensor
+Tensor = torch.CudaTensor
 
 n_features = 28 * 28
-n_z = 20			--20
-rnn_size = 100		--100
+n_z = 100			--20
+rnn_size = 256		--100
 n_canvas = 28 * 28
-seq_length = 50		--50
+seq_length = 64		--50
 
-N = 3
+N = 12				--3
 A = 28
-n_data = 20		--20
+n_data = 100		--20
 
 function duplicate(x)
   local y = nn.Reshape(1)(x)
@@ -351,7 +351,7 @@ end
 ------------------------------------------------------------------------
 -- optimization loop
 --
-optim_state = {learningRate = 1e-2}
+optim_state = {learningRate = 1e-3}
 
 for i = 1, 1000 do
   local _, loss = optim.adagrad(feval, params, optim_state)
@@ -365,13 +365,13 @@ end
 
 
 --к чему стремимся
-print(x[1][1]:gt(0.5))
+--print(x[1][1]:gt(0.5))
 
 --что получаем со временем
-for t = 1, seq_length do
-  print(patch[t][1]:gt(0.5))
-  print(x_prediction[t][1]:gt(0.5))
-end
+--for t = 1, seq_length do
+--  print(patch[t][1]:gt(0.5))
+--  print(x_prediction[t][1]:gt(0.5))
+--end
 
 
 torch.save('x_prediction', x_prediction)
