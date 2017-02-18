@@ -19,9 +19,9 @@ rnn_size = 256		--100
 n_canvas = 28 * 28
 seq_length = 64		--50
 
-N = 12				--3
+N = 5				--3
 A = 28
-n_data = 100		--20
+n_data = 90		--20
 
 function duplicate(x)
   local y = nn.Reshape(1)(x)
@@ -131,6 +131,15 @@ encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e, h_dec_prev, ascending}
 encoder = encoder:cuda()
 encoder.name = 'encoder'
 
+-- print encoder node details
+--[[print('Encoder node details are as below: \n')
+for indexNode, node in ipairs(encoder.forwardnodes) do
+  if node.data.module then
+    print(node.data.module)
+  end
+end]]--
+
+
 
 --decoder
 x = nn.Identity()()
@@ -170,6 +179,7 @@ gamma = duplicate(nn.Linear(rnn_size, 1)(next_h))
 sigma = duplicate(nn.Linear(rnn_size, 1)(next_h))
 delta = nn.Exp()(delta)
 gamma = nn.Exp()(gamma)
+--gamma = nn.Power(0.5)(gamma)	-- added to check
 sigma = nn.Exp()(sigma)
 sigma = nn.Power(-2)(sigma)
 sigma = nn.MulConstant(-1/2)(sigma)
@@ -223,6 +233,13 @@ decoder = nn.gModule({x, z, prev_c, prev_h, prev_canvas, ascending}, {x_predicti
 decoder = decoder:cuda()
 decoder.name = 'decoder'
 
+-- print decoder node details
+--[[print('Decoder node details are as below: \n')
+for indexNode, node in ipairs(decoder.forwardnodes) do
+  if node.data.module then
+    print(node.data.module)
+  end
+end]]--
 
 --train
 trainset = mnist.traindataset()
@@ -270,13 +287,6 @@ function feval(x_arg)
     x = {}
     patch = {}
     
-	--lstm_h_enc = lstm_h_enc:cuda()
-	--lstm_c_enc = lstm_c_enc:cuda()    
-	--lstm_h_dec = lstm_h_dec:cuda()
-	--lstm_c_dec = lstm_c_dec:cuda()    
-	--x_error = w_error:cuda()
-	--canvas = canvas:cuda()
-
     local loss = 0
 
     for t = 1, seq_length do
@@ -292,6 +302,23 @@ function feval(x_arg)
 	  ascending = ascending:cuda()
 
 	  z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t], patch[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t], lstm_h_dec[t-1], ascending}))
+	  --[[print('z')
+	  print(z[t]:size())
+	  print('loss_z')
+	  print(loss_z[t]:size())
+	  print('lstm_c_enc')
+	  print(lstm_c_enc[t]:size())
+	  print('lstm_h_enc')
+	  print(lstm_h_enc[t]:size())
+	  print('patch')
+	  print(patch[t]:size())
+	  print('x')
+	  print(x[t]:size())
+	  print('encoder_clones')
+	  print(encoder_clones[t]:size())
+	  print('encoder_clones:x')
+	  print(encoder_clones[t].x:size())]]--
+	  
       x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1], ascending}))
       --print(patch[1]:gt(0.5))
       
@@ -325,8 +352,6 @@ function feval(x_arg)
       dx_prediction[t] = torch.zeros(n_data, 28, 28):cuda()
       dpatch[t] = torch.zeros(n_data, N, N):cuda()
 
-	  --dx1[t] = dx1[t]:cuda()
-	  --dz[t] = dz[t]:cuda()
 	  dx_error[t] = dx_error[t]:cuda()
 	  dlstm_c_dec[t] = dlstm_c_dec[t]:cuda()
 	  dlstm_h_dec[t] = dlstm_h_dec[t]:cuda()
@@ -334,8 +359,6 @@ function feval(x_arg)
 	  
   	  dlstm_c_enc[t] = dlstm_c_enc[t]:cuda()
   	  dlstm_h_enc[t] = dlstm_h_enc[t]:cuda()
-  	  --dlstm_h_dec1[t-1] = dlstm_h_dec1[t-1]:cuda()
-   	  --dlstm_h_dec2[t-1] = dlstm_h_dec2[t-1]:cuda()
   	  	  
       dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec1[t-1], dcanvas[t-1], dascending1 = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dx_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t], dloss_x[t]}))
       dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t], dlstm_h_dec2[t-1], dascending2 = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t], lstm_h_dec[t-1], ascending}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t], dpatch[t]}))
@@ -351,9 +374,9 @@ end
 ------------------------------------------------------------------------
 -- optimization loop
 --
-optim_state = {learningRate = 1e-3}
+optim_state = {learningRate = 1e-2}
 
-for i = 1, 1000 do
+for i = 1, 100 do
   local _, loss = optim.adagrad(feval, params, optim_state)
 
   if i % 10 == 0 then
