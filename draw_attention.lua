@@ -17,11 +17,11 @@ n_features = 28 * 28
 n_z = 100			--20
 rnn_size = 256		--100
 n_canvas = 28 * 28
-seq_length = 64		--50
+seq_length = 128		--50
 
-N = 5				--3
+N = 15				--3
 A = 28
-n_data = 90		--20
+n_data = 64		--20
 
 function duplicate(x)
   local y = nn.Reshape(1)(x)
