@@ -15,16 +15,16 @@ Tensor = torch.CudaTensor
 
 n_z = 100			--20
 rnn_size = 256		--100
-n_canvas = 32 * 32
+n_canvas = 28*28
 seq_length = 64		--50
 -- input channels (RGB/greyscale etc.)
-n_channels = 3
+n_channels = 1
 
 --N = 15				--3
 -- Image Height
-A = 32
+A = 28
 -- Image Width
-B = 32
+B = 28
 n_data = 90		--20
 
 function duplicate(x)
@@ -46,11 +46,20 @@ x_error_prev = nn.Identity()()  -- difference of images from the last step. No f
 layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x)
 layer1 = nn.ReLU()(layer1)
 layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
-layer2 = nn.ReLU(layer2)
+layer2 = nn.ReLU()(layer2)
 layer3 = nn.SpatialConvolution(16, 16, 3, 3)(layer2)
-layer3 = nn.ReLU(layer3)
-layer3_flat = nn.View(16*10*10)(layer3)
-fc1 = nn.Linear(16*10*10, 256)(layer3_flat)
+layer3 = nn.ReLU()(layer3)
+layer3_flat = nn.View(16*8*8)(layer3)
+fc1 = nn.Linear(16*8*8, rnn_size)(layer3_flat)
+
+layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x_error_prev)
+layer1_e = nn.ReLU()(layer1_e)
+layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
+layer2_e = nn.ReLU()(layer2_e)
+layer3_e = nn.SpatialConvolution(16, 16, 3, 3)(layer2_e)
+layer3_e = nn.ReLU()(layer3_e)
+layer3_flat_e = nn.View(16*8*8)(layer3_e)
+fc1_e = nn.Linear(16*8*8, rnn_size)(layer3_flat_e)
 
 --[[
 h_dec_prev = nn.Identity()()
@@ -102,9 +111,10 @@ read_input = nn.Reshape(2 * N * N)(read_input)
 ]]--
 --read end
 
-input = nn.JoinTable(3)({x, x_error_prev})
-input = nn.Reshape(2*A*B)(input)
-n_input = 2 * A * B
+
+input = nn.JoinTable(2)({fc1, fc1_e})
+input = nn.View(rnn_size)(input)
+n_input = rnn_size
 
 prev_h = nn.Identity()()
 prev_c = nn.Identity()()
@@ -187,6 +197,17 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
+fc_1 = nn.Linear(rnn_size, 16*8*8)(next_h)
+fc_1 = nn.View(16, 8, 8)(fc_1)
+fc_1 = nn.ReLU()(fc_1)
+layer_1 = nn.SpatialFullConvolution(16, 16, 3, 3)(fc_1)
+layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
+layer_2 = nn.ReLU()(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5, 2, 2)(layer_2)
+
+write_layer = layer_3
+
 --[[
 gx = duplicate(nn.Linear(rnn_size, 1)(next_h))
 --gx = duplicate(nn.Linear(rnn_size, 1)(next_h))
@@ -424,7 +445,7 @@ for t = 1, seq_length do
       x[t] = features_input:cuda()
       z[t] = torch.randn(n_data, n_z):cuda()
       x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
-  end
+end
 
 torch.save('x_generation', x_prediction)
 
