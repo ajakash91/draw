@@ -11,8 +11,11 @@ require 'nngraph'
 
 n_channels = 1
 rnn_size = 256
+n_data = 10
 
 x = nn.Identity()()
+
+--[[
 x_error_prev = nn.Identity()()
 
 layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x)
@@ -26,26 +29,55 @@ fc1 = nn.Linear(16*8*8, rnn_size)(layer3_flat)
 
 --net = nn.gModule({x}, {fc1})
 
-
 layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x_error_prev)
-layer1_e = nn.ReLU()(layer1_e)
+layer1_e = nn.ReLU(True)(layer1_e)
 layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
-layer2_e = nn.ReLU()(layer2_e)
+layer2_e = nn.ReLU(True)(layer2_e)
 layer3_e = nn.SpatialConvolution(16, 16, 3, 3)(layer2_e)
-layer3_e = nn.ReLU()(layer3_e)
+layer3_e = nn.ReLU(True)(layer3_e)
 layer3_flat_e = nn.View(16*8*8)(layer3_e)
-fc1_e = nn.Linear(16*8*8, rnn_size)(layer3_flat)
+fc1_e = nn.Linear(16*8*8, rnn_size)(layer3_flat_e)
 
 out = nn.JoinTable(2)({fc1, fc1_e})
 out = nn.View(rnn_size)(out)
 
-net = nn.gModule({x, x_error_prev}, {fc1, fc1_e, out})
+net = nn.gModule({x, x_error_prev}, {out})
 
-input = torch.rand(1, 28, 28)
-input2 = torch.rand(1, 28, 28)
+input = torch.rand(n_data, 1, 28, 28)
+input2 = torch.rand(n_data, 1, 28, 28)
 
-f1, f1e, output = net:forward({input, input2})
+output = net:forward({input, input2})
 --output = net:forward(input)
+]]--
+
+next_h = nn.Identity()()
+
+fc_1 = nn.Linear(rnn_size, 16*8*8)(next_h)
+fc_1 = nn.View(16, 8, 8)(fc_1)
+fc_1 = nn.ReLU()(fc_1)
+layer_1 = nn.SpatialFullConvolution(16, 16, 3, 3)(fc_1)
+layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
+layer_2 = nn.ReLU()(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5, 2, 2, 0, 0, 1, 1)(layer_2)
+
+next_canvas = layer_3--nn.CAddTable()({prev_canvas, write_layer})
+
+mu = nn.Sigmoid()(next_canvas)
+
+neg_mu = nn.MulConstant(-1)(mu)
+d = nn.CAddTable()({x, neg_mu})
+d2 = nn.Power(2)(d)
+loss_x = nn.Sum(4)(d2)
+loss_x = nn.Sum(3)(loss_x)
+loss_x = nn.Sum(2)(loss_x)
+
+net = nn.gModule({x, next_h}, {loss_x})
+
+x = torch.rand(n_data, n_channels, 28, 28)
+h = torch.rand(n_data, 256)
+
+output = net:forward({x, h})
 
 print(output)
 

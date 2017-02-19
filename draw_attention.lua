@@ -72,7 +72,7 @@ function genr_filters(g)
       exp_i = nn.View(n_data, 1, A)(exp_i)
       filters[#filters + 1] = nn.CMulTable()({exp_i, gamma})
   end
-  filterbank = nn.JoinTable(2)(filters) 
+  filterbank = nn.JoinTable(2)(filters)
 --  filterbank = filterbank:cuda()
   return filterbank
 end

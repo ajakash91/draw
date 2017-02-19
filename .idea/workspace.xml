@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/code_test.lua" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Expt_parameters.ods" afterPath="$PROJECT_DIR$/Expt_parameters.ods" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code_test.lua" afterPath="$PROJECT_DIR$/code_test.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_attention.lua" afterPath="$PROJECT_DIR$/draw_attention.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_convolution.lua" afterPath="$PROJECT_DIR$/draw_convolution.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot_results_no_binarization.lua" afterPath="$PROJECT_DIR$/plot_results_no_binarization.lua" />
@@ -25,33 +23,20 @@
       <file leaf-file-name="draw_convolution.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="432">
-              <caret line="115" column="30" lean-forward="false" selection-start-line="115" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
+            <state relative-caret-position="144">
+              <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
               <folding>
-                <element signature="n#duplicate#0" expanded="false" />
-                <element signature="e#1501#3121#0" expanded="false" />
-                <element signature="e#4629#4801#0" expanded="false" />
-                <element signature="e#5988#7426#0" expanded="false" />
+                <element signature="e#6068#6468#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="code_test.lua" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/code_test.lua">
+      <file leaf-file-name="plot_results_no_binarization.lua" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/plot_results_no_binarization.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="666">
-              <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="draw_attention.lua" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/draw_attention.lua">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="504">
-              <caret line="31" column="30" lean-forward="false" selection-start-line="31" selection-start-column="30" selection-end-line="31" selection-end-column="30" />
+            <state relative-caret-position="198">
+              <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -68,6 +53,13 @@
       <find>next_h</find>
       <find>rnn_size</find>
       <find>forwar</find>
+      <find>encoder</find>
+      <find>1</find>
+      <find>x_error_prev</find>
+      <find>x</find>
+      <find>Resha</find>
+      <find>View</find>
+      <find>loss</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -76,17 +68,18 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/draw_convolution.lua" />
         <option value="$PROJECT_DIR$/draw_attention.lua" />
         <option value="$PROJECT_DIR$/code_test.lua" />
+        <option value="$PROJECT_DIR$/draw_convolution.lua" />
+        <option value="$PROJECT_DIR$/plot_results_no_binarization.lua" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1986" />
-    <option name="y" value="51" />
-    <option name="width" value="1400" />
-    <option name="height" value="992" />
+    <option name="x" value="1919" />
+    <option name="y" value="24" />
+    <option name="width" value="1922" />
+    <option name="height" value="1033" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -286,10 +279,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1986" y="51" width="1400" height="992" extended-state="0" />
+    <frame x="1919" y="24" width="1922" height="1033" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18669528" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1359375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -314,13 +307,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/draw_convolution.lua</url>
-          <line>342</line>
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="1" />
+      <option name="time" value="2" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -330,10 +317,7 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="n#duplicate#0" expanded="false" />
-            <element signature="e#1501#3121#0" expanded="false" />
-            <element signature="e#4629#4801#0" expanded="false" />
-            <element signature="e#5988#7426#0" expanded="false" />
+            <element signature="e#6068#6468#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -346,31 +330,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/code_test.lua">
+    <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="666">
-          <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
-          <folding />
+        <state relative-caret-position="144">
+          <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+          <folding>
+            <element signature="e#6068#6468#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
+    <entry file="file://$PROJECT_DIR$/code_test.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="115" column="30" lean-forward="false" selection-start-line="115" selection-start-column="0" selection-end-line="116" selection-end-column="0" />
-          <folding>
-            <element signature="n#duplicate#0" expanded="false" />
-            <element signature="e#1501#3121#0" expanded="false" />
-            <element signature="e#4629#4801#0" expanded="false" />
-            <element signature="e#5988#7426#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="582">
+          <caret line="72" column="25" lean-forward="false" selection-start-line="72" selection-start-column="25" selection-end-line="72" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/draw_attention.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="31" column="30" lean-forward="false" selection-start-line="31" selection-start-column="30" selection-end-line="31" selection-end-column="30" />
+        <state relative-caret-position="256">
+          <caret line="223" column="19" lean-forward="true" selection-start-line="223" selection-start-column="19" selection-end-line="223" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot_results_no_binarization.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="198">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding />
         </state>
       </provider>
