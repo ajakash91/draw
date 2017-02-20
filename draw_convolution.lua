@@ -16,7 +16,7 @@ Tensor = torch.CudaTensor
 n_z = 100			--20
 rnn_size = 256		--100
 n_canvas = 28*28
-seq_length = 64		--50
+seq_length = 32		--50
 -- input image channels
 n_channels = 1
 
@@ -25,30 +25,30 @@ n_channels = 1
 A = 28
 -- Image Width
 B = 28
-n_data = 90		--20
+n_data = 80		--20
 
 --encoder 
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
 --read
-layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x)
+layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
 layer1 = nn.ReLU()(layer1)
 layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
 layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(16, 16, 3, 3)(layer2)
+layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
 layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(16*8*8)(layer3)
-fc1 = nn.Linear(16*8*8, rnn_size)(layer3_flat)
+layer3_flat = nn.View(32*10*10)(layer3)
+fc1 = nn.Linear(32*10*10, rnn_size)(layer3_flat)
 
-layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x_error_prev)
-layer1_e = nn.ReLU()(layer1_e)
+layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x_error_prev)
+layer1_e = nn.ReLU(True)(layer1_e)
 layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
-layer2_e = nn.ReLU()(layer2_e)
-layer3_e = nn.SpatialConvolution(16, 16, 3, 3)(layer2_e)
-layer3_e = nn.ReLU()(layer3_e)
-layer3_flat_e = nn.View(16*8*8)(layer3_e)
-fc1_e = nn.Linear(16*8*8, rnn_size)(layer3_flat_e)
+layer2_e = nn.ReLU(True)(layer2_e)
+layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
+layer3_e = nn.ReLU(True)(layer3_e)
+layer3_flat_e = nn.View(32*10*10)(layer3_e)
+fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)
 
 --read end
 
@@ -128,14 +128,14 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
-fc_1 = nn.Linear(rnn_size, 16*8*8)(next_h)
-fc_1 = nn.View(16, 8, 8)(fc_1)
+fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
+fc_1 = nn.View(32, 10, 10)(fc_1)
 fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(16, 16, 3, 3)(fc_1)
+layer_1 = nn.SpatialFullConvolution(32, 16, 3, 3, 2, 2, 0, 0, 1, 1)(fc_1)
 layer_1 = nn.ReLU()(layer_1)
 layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5, 2, 2, 0, 0, 1, 1)(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)
 
 write_layer = layer_3
 
@@ -235,7 +235,7 @@ function feval(x_arg)
       loss = loss + torch.mean(loss_z[t]) + torch.mean(loss_x[t])
     end
     loss = loss / seq_length
-    print(loss)
+    --print(loss)
 
     ------------------ backward pass -------------------
     -- complete reverse order of the above
@@ -283,16 +283,25 @@ end
 ------------------------------------------------------------------------
 -- optimization loop
 --
-optim_state = {learningRate = 1e-2}
+--optim_state = {learningRate = 1e-2}
 
-for i = 1, 100 do
-  local _, loss = optim.adagrad(feval, params, optim_state)
+for i = 1, 1000 do
+    if i <= 33 then
+        optim_state = {learningRate = 1e-2}
+    elseif i <= 66 then
+        optim_state = {learningRate = 1e-3}
+    else
+        optim_state = {learningRate = 3e-4}
+    end
 
-  if i % 10 == 0 then
-      print(string.format("iteration %4d, loss = %6.6f", i, loss[1]))
-      --print(params)
+    local _, loss = optim.adagrad(feval, params, optim_state)
+
+
+    if i % 10 == 0 then
+        print(string.format("iteration %4d, loss = %6.6f", i, loss[1]))
+        --print(params)
       
-  end
+    end
 end
 
 torch.save('x_prediction', x_prediction)

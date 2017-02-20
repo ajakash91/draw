@@ -9,8 +9,8 @@ local model_utils=require 'model_utils'
 local mnist = require 'mnist'
 nngraph.setDebug(true)
 
-x_prediction = torch.load('x_prediction')
---x_prediction = torch.load('x_generation')
+--x_prediction = torch.load('x_prediction')
+x_prediction = torch.load('x_generation')
 
 x = torch.zeros(#x_prediction, x_prediction[1]:size(3), x_prediction[1]:size(4))
 x = x:cuda()

@@ -14,29 +14,29 @@ rnn_size = 256
 n_data = 10
 
 x = nn.Identity()()
-
 --[[
+--Convolution
 x_error_prev = nn.Identity()()
 
-layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x)
+layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
 layer1 = nn.ReLU()(layer1)
 layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
 layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(16, 16, 3, 3)(layer2)
+layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
 layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(16*8*8)(layer3)
-fc1 = nn.Linear(16*8*8, rnn_size)(layer3_flat)
+layer3_flat = nn.View(32*10*10)(layer3)
+fc1 = nn.Linear(32*10*10, rnn_size)(layer3_flat)
 
 --net = nn.gModule({x}, {fc1})
 
-layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 2, 2)(x_error_prev)
+layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x_error_prev)
 layer1_e = nn.ReLU(True)(layer1_e)
 layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
 layer2_e = nn.ReLU(True)(layer2_e)
-layer3_e = nn.SpatialConvolution(16, 16, 3, 3)(layer2_e)
+layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
 layer3_e = nn.ReLU(True)(layer3_e)
-layer3_flat_e = nn.View(16*8*8)(layer3_e)
-fc1_e = nn.Linear(16*8*8, rnn_size)(layer3_flat_e)
+layer3_flat_e = nn.View(32*10*10)(layer3_e)
+fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)
 
 out = nn.JoinTable(2)({fc1, fc1_e})
 out = nn.View(rnn_size)(out)
@@ -50,16 +50,17 @@ output = net:forward({input, input2})
 --output = net:forward(input)
 ]]--
 
+-- Deconvolution
 next_h = nn.Identity()()
 
-fc_1 = nn.Linear(rnn_size, 16*8*8)(next_h)
-fc_1 = nn.View(16, 8, 8)(fc_1)
+fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
+fc_1 = nn.View(32, 10, 10)(fc_1)
 fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(16, 16, 3, 3)(fc_1)
+layer_1 = nn.SpatialFullConvolution(32, 16, 3, 3, 2, 2, 0, 0, 1, 1)(fc_1)
 layer_1 = nn.ReLU()(layer_1)
 layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5, 2, 2, 0, 0, 1, 1)(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)
 
 next_canvas = layer_3--nn.CAddTable()({prev_canvas, write_layer})
 
@@ -72,13 +73,14 @@ loss_x = nn.Sum(4)(d2)
 loss_x = nn.Sum(3)(loss_x)
 loss_x = nn.Sum(2)(loss_x)
 
-net = nn.gModule({x, next_h}, {loss_x})
+net = nn.gModule({x, next_h}, {next_canvas, loss_x})
+
+--net = nn.gModule({next_h}, {next_canvas})
 
 x = torch.rand(n_data, n_channels, 28, 28)
 h = torch.rand(n_data, 256)
 
 output = net:forward({x, h})
-
 print(output)
 
 
