@@ -53,16 +53,28 @@ output = net:forward({input, input2})
 -- Deconvolution
 next_h = nn.Identity()()
 
-fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
+--[[fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
 fc_1 = nn.View(32, 10, 10)(fc_1)
 fc_1 = nn.ReLU()(fc_1)
 layer_1 = nn.SpatialFullConvolution(32, 16, 3, 3, 2, 2, 0, 0, 1, 1)(fc_1)
 layer_1 = nn.ReLU()(layer_1)
 layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)]]--
 
-next_canvas = layer_3--nn.CAddTable()({prev_canvas, write_layer})
+fc_1 = nn.Linear(rnn_size, 128*12*12)(next_h)
+fc_1 = nn.View(128, 12, 12)(fc_1)
+fc_1 = nn.ReLU()(fc_1)
+layer_1 = nn.SpatialFullConvolution(128, 64, 5, 5)(fc_1)
+layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(64, 32, 5, 5)(layer_1)
+layer_2 = nn.ReLU()(layer_2)
+layer_3 = nn.SpatialFullConvolution(32, 16, 5, 5)(layer_2)
+layer_3 = nn.ReLU()(layer_3)
+layer_4 = nn.SpatialFullConvolution(16, n_channels, 5, 5)(layer_3)
+
+
+next_canvas = layer_4--nn.CAddTable()({prev_canvas, write_layer})
 
 mu = nn.Sigmoid()(next_canvas)
 

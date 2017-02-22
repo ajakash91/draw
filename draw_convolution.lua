@@ -13,10 +13,10 @@ require 'cunn'
 
 Tensor = torch.CudaTensor
 
-n_z = 100			--20
-rnn_size = 256		--100
+n_z = 100			--20    --400
+rnn_size = 256		--100   --1024
 n_canvas = 28*28
-seq_length = 32		--50
+seq_length = 15		--50
 -- input image channels
 n_channels = 1
 
@@ -25,14 +25,32 @@ n_channels = 1
 A = 28
 -- Image Width
 B = 28
-n_data = 80		--20
-
+n_data = 30
 --encoder 
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
+o1 = 48
+o2 = 96
+f1 = 3
+f2 = 3
+
+function enc_convolution(x)
+    layer1 = nn.SpatialConvolution(n_channels, o1, f1, f1)(x)
+    layer1 = nn.ReLU()(layer1)
+    layer2 = nn.SpatialConvolution(o1, o2, f2, f2)(layer1)
+    layer2 = nn.ReLU()(layer2)
+    --layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
+    --layer3 = nn.ReLU()(layer3)
+    layer3_flat = nn.View(o2*(A-f1-f2+2)*(A-f1-f2+2))(layer2)
+    fc = nn.Linear(o2*(A-f1-f2+2)*(A-f1-f2+2), rnn_size)(layer3_flat)
+
+    return(fc)
+end
+
+
 --read
-layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
+--[[layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
 layer1 = nn.ReLU()(layer1)
 layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
 layer2 = nn.ReLU()(layer2)
@@ -48,10 +66,53 @@ layer2_e = nn.ReLU(True)(layer2_e)
 layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
 layer3_e = nn.ReLU(True)(layer3_e)
 layer3_flat_e = nn.View(32*10*10)(layer3_e)
-fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)
+fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)]]--
+
+--[[layer1 = nn.SpatialConvolution(n_channels, 16, 5, 5)(x)
+layer1 = nn.ReLU()(layer1)
+layer2 = nn.SpatialConvolution(16, 32, 5, 5)(layer1)
+layer2 = nn.ReLU()(layer2)
+layer3 = nn.SpatialConvolution(32, 64, 5, 5)(layer2)
+layer3 = nn.ReLU()(layer3)
+layer4 = nn.SpatialConvolution(64, 128, 5, 5)(layer3)
+layer4 = nn.ReLU()(layer4)
+layer4_flat = nn.View(128*12*12)(layer4)
+fc1 = nn.Linear(128*12*12, rnn_size)(layer4_flat)
+
+layer1_e = nn.SpatialConvolution(n_channels, 16, 5, 5)(x_error_prev)
+layer1_e = nn.ReLU()(layer1_e)
+layer2_e = nn.SpatialConvolution(16, 32, 5, 5)(layer1_e)
+layer2_e = nn.ReLU()(layer2_e)
+layer3_e = nn.SpatialConvolution(32, 64, 5, 5)(layer2_e)
+layer3_e = nn.ReLU()(layer3_e)
+layer4_e = nn.SpatialConvolution(64, 128, 5, 5)(layer3_e)
+layer4_e = nn.ReLU()(layer4_e)
+layer4_flat_e = nn.View(128*12*12)(layer4_e)
+fc1_e = nn.Linear(128*12*12, rnn_size)(layer4_flat_e)
+]]--
+
+--[[layer1 = nn.SpatialConvolution(n_channels, 32, 5, 5)(x)
+layer1 = nn.ReLU()(layer1)
+layer2 = nn.SpatialConvolution(32, 64, 5, 5)(layer1)
+layer2 = nn.ReLU()(layer2)
+--layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
+--layer3 = nn.ReLU()(layer3)
+layer3_flat = nn.View(64*20*20)(layer2)
+fc1 = nn.Linear(64*20*20, rnn_size)(layer3_flat)
+
+layer1_e = nn.SpatialConvolution(n_channels, 32, 5, 5)(x_error_prev)
+layer1_e = nn.ReLU(True)(layer1_e)
+layer2_e = nn.SpatialConvolution(32, 64, 5, 5)(layer1_e)
+layer2_e = nn.ReLU(True)(layer2_e)
+--layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
+--layer3_e = nn.ReLU(True)(layer3_e)
+layer3_flat_e = nn.View(64*20*20)(layer2_e)
+fc1_e = nn.Linear(64*20*20, rnn_size)(layer3_flat_e)]]--
+
+fc1 = enc_convolution(x)
+fc1_e = enc_convolution(x_error_prev)
 
 --read end
-
 
 input = nn.JoinTable(2)({fc1, fc1_e})
 input = nn.View(rnn_size*2)(input)
@@ -128,16 +189,36 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
-fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
+--[[fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
 fc_1 = nn.View(32, 10, 10)(fc_1)
 fc_1 = nn.ReLU()(fc_1)
 layer_1 = nn.SpatialFullConvolution(32, 16, 3, 3, 2, 2, 0, 0, 1, 1)(fc_1)
 layer_1 = nn.ReLU()(layer_1)
 layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)
+layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)]]--
 
-write_layer = layer_3
+--[[fc_1 = nn.Linear(rnn_size, 128*12*12)(next_h)
+fc_1 = nn.View(128, 12, 12)(fc_1)
+fc_1 = nn.ReLU()(fc_1)
+layer_1 = nn.SpatialFullConvolution(128, 64, 5, 5)(fc_1)
+layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(64, 32, 5, 5)(layer_1)
+layer_2 = nn.ReLU()(layer_2)
+layer_3 = nn.SpatialFullConvolution(32, 16, 5, 5)(layer_2)
+layer_3 = nn.ReLU()(layer_3)
+layer_4 = nn.SpatialFullConvolution(16, n_channels, 5, 5)(layer_3)]]--
+
+fc_1 = nn.Linear(rnn_size, o2*(A-f1-f2+2)*(A-f1-f2+2))(next_h)
+fc_1 = nn.View(o2, (A-f1-f2+2), (A-f1-f2+2))(fc_1)
+fc_1 = nn.ReLU()(fc_1)
+layer_1 = nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1)
+layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_1)
+--layer_2 = nn.ReLU()(layer_2)
+--layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)
+
+write_layer = layer_2
 
 --write layer end
 
@@ -235,7 +316,7 @@ function feval(x_arg)
       loss = loss + torch.mean(loss_z[t]) + torch.mean(loss_x[t])
     end
     loss = loss / seq_length
-    --print(loss)
+    print(loss)
 
     ------------------ backward pass -------------------
     -- complete reverse order of the above
@@ -283,24 +364,21 @@ end
 ------------------------------------------------------------------------
 -- optimization loop
 --
---optim_state = {learningRate = 1e-2}
 
-for i = 1, 1000 do
-    if i <= 33 then
-        optim_state = {learningRate = 1e-2}
-    elseif i <= 66 then
-        optim_state = {learningRate = 1e-3}
-    else
-        optim_state = {learningRate = 3e-4}
-    end
+lr = 1e-2
+optim_state = {learningRate = lr}
+
+for i = 1, 100 do
+    --[[if i % 33 == 0 then
+        lr = lr / 4
+        optim_state = {learningRate = lr}
+    end]]--
 
     local _, loss = optim.adagrad(feval, params, optim_state)
-
 
     if i % 10 == 0 then
         print(string.format("iteration %4d, loss = %6.6f", i, loss[1]))
         --print(params)
-      
     end
 end
 
