@@ -25,7 +25,7 @@ n_channels = 1
 A = 28
 -- Image Width
 B = 28
-n_data = 30
+n_data = 10
 --encoder 
 x = nn.Identity()()
 x_error_prev = nn.Identity()()

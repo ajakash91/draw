@@ -1,0 +1,102 @@
+require 'torch'
+require 'nn'
+require 'cudnn'
+require 'cunn'
+
+local VAE = {}
+
+function VAE.get_encoder(input_size, hidden_layer_size, latent_variable_size)
+     -- The Encoder
+    local encoder = nn.Sequential()
+    encoder:add(nn.Linear(input_size, hidden_layer_size*2))
+    encoder:add(nn.ReLU(true))
+    encoder:add(nn.Linear(hidden_layer_size*2, hidden_layer_size))
+    encoder:add(nn.ReLU(true))
+    
+    mean_logvar = nn.ConcatTable()
+    mean_logvar:add(nn.Linear(hidden_layer_size, latent_variable_size))
+    mean_logvar:add(nn.Linear(hidden_layer_size, latent_variable_size))
+
+    encoder:add(mean_logvar)
+    
+    return encoder
+end
+
+function VAE.get_decoder(input_size, hidden_layer_size, latent_variable_size, continuous)
+    -- The Decoder
+    local decoder = nn.Sequential()
+    decoder:add(nn.Linear(latent_variable_size, hidden_layer_size))
+    decoder:add(nn.ReLU(true))
+    decoder:add(nn.Linear(hidden_layer_size, hidden_layer_size*2))
+
+    if continuous then
+        mean_logvar = nn.ConcatTable()
+        mean_logvar:add(nn.Linear(hidden_layer_size*2, input_size))
+        mean_logvar:add(nn.Linear(hidden_layer_size*2, input_size))
+        decoder:add(mean_logvar)
+    else
+        decoder:add(nn.Linear(hidden_layer_size, input_size))
+        decoder:add(nn.Sigmoid(true))
+    end
+
+    return decoder
+end
+
+function VAE.get_conv_encoder(ks, hidden_layer_size, latent_variable_size)
+     -- The Encoder
+    local encoder = nn.Sequential()
+    --encoder:add(nn.Reshape(1, 64, 64))
+
+    encoder:add(cudnn.SpatialConvolution(1, 16, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    encoder:add(cudnn.ReLU(true))
+    encoder:add(cudnn.SpatialConvolution(16, 32, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    encoder:add(cudnn.ReLU(true))
+    encoder:add(cudnn.SpatialMaxPooling(2,2))
+    encoder:add(cudnn.SpatialConvolution(32, 64, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    encoder:add(cudnn.ReLU(true))
+    encoder:add(cudnn.SpatialMaxPooling(2,2))
+    encoder:add(cudnn.SpatialConvolution(64, 128, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    encoder:add(cudnn.ReLU(true))
+    encoder:add(cudnn.SpatialMaxPooling(2,2))
+    encoder:add(nn.View(8192))
+    encoder:add(nn.Linear(8192, hidden_layer_size))
+    encoder:add(nn.ReLU(true))
+    
+    mean_logvar = nn.ConcatTable()
+    mean_logvar:add(nn.Linear(hidden_layer_size, latent_variable_size))
+    mean_logvar:add(nn.Linear(hidden_layer_size, latent_variable_size))
+
+    encoder:add(mean_logvar)
+
+    return encoder
+end
+
+function VAE.get_conv_decoder(ks, hidden_layer_size, latent_variable_size)
+    -- The Decoder
+    local decoder = nn.Sequential()
+    decoder:add(nn.Linear(latent_variable_size, hidden_layer_size))
+    decoder:add(nn.ReLU(true))
+    decoder:add(nn.Linear(hidden_layer_size, 8192))
+    decoder:add(nn.ReLU(true))
+    decoder:add(nn.View(128, 8, 8))
+    decoder:add(nn.SpatialUpSamplingNearest(2))
+    decoder:add(nn.SpatialConvolution(128, 64, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    decoder:add(nn.ReLU(true))
+    decoder:add(nn.SpatialUpSamplingNearest(2)) --32
+    decoder:add(cudnn.SpatialConvolution(64, 32, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    decoder:add(nn.ReLU(true))
+    decoder:add(nn.SpatialUpSamplingNearest(2)) --64
+    decoder:add(cudnn.SpatialConvolution(32, 16, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    decoder:add(nn.ReLU(true))
+
+    mean_logvar = nn.ConcatTable()
+    mean_logvar:add(cudnn.SpatialConvolution(16, 1, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+    mean_logvar:add(cudnn.SpatialConvolution(16, 1, ks, ks, 1, 1, (ks-1)/2, (ks-1)/2))
+
+    decoder:add(mean_logvar)
+    return decoder
+end
+
+
+return VAE
+

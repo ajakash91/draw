@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Expt_parameters.ods" afterPath="$PROJECT_DIR$/Expt_parameters.ods" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/code_test.lua" afterPath="$PROJECT_DIR$/code_test.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_convolution.lua" afterPath="$PROJECT_DIR$/draw_convolution.lua" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot_results_no_binarization.lua" afterPath="$PROJECT_DIR$/plot_results_no_binarization.lua" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,8 +20,8 @@
       <file leaf-file-name="draw_convolution.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6354">
-              <caret line="374" column="11" lean-forward="false" selection-start-line="374" selection-start-column="11" selection-end-line="374" selection-end-column="11" />
+            <state relative-caret-position="306">
+              <caret line="26" column="6" lean-forward="true" selection-start-line="26" selection-start-column="6" selection-end-line="26" selection-end-column="6" />
               <folding>
                 <element signature="e#9160#9560#0" expanded="false" />
               </folding>
@@ -36,8 +32,8 @@
       <file leaf-file-name="sample" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/sample">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="7" column="56" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+            <state relative-caret-position="450">
+              <caret line="25" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -389,14 +385,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sample">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="7" column="56" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/draw_attention.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="666">
@@ -413,10 +401,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/sample">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="25" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6354">
-          <caret line="374" column="11" lean-forward="false" selection-start-line="374" selection-start-column="11" selection-end-line="374" selection-end-column="11" />
+        <state relative-caret-position="306">
+          <caret line="26" column="6" lean-forward="true" selection-start-line="26" selection-start-column="6" selection-end-line="26" selection-end-column="6" />
           <folding>
             <element signature="e#9160#9560#0" expanded="false" />
           </folding>
