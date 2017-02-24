@@ -49,6 +49,35 @@ final_width = A-f1-f2-f3+3
     return(fc)
 end]]--
 
+function read_features(dir_name, file_extention)
+    -- Go over all files in directory. We use an iterator, paths.files().
+    for file in paths.files(dir_name) do
+       -- We only load files that match the extension
+       if file:find(file_extention .. '$') then
+          -- and insert the ones we care about in our table
+          table.insert(files, paths.concat(dir_name,file))
+       end
+    end
+
+    -- Check files
+    if #files == 0 then
+       error('given directory doesnt contain any files of type: ' .. opt.ext)
+    end
+
+    -- Sorting the files
+    table.sort(files, function (a,b) return a < b end)
+
+    text_features = {}
+    for i,file in ipairs(files) do
+       -- load each image
+       table.insert(text_features, torch.load(file))
+    end
+    --print(features)
+
+    -- Read images using the filenames
+    image_features =
+end
+
 function enc_convolution(x)
     layer1 = nn.SpatialConvolution(n_channels, o1, f1, f1)(x)
     layer1 = nn.ReLU()(layer1)
@@ -260,7 +289,8 @@ testset = mnist.testdataset()
 features_input = torch.zeros(n_data, n_channels, A, B)
 
 for i = 1, n_data do
-    features_input[{{i}, {1}, {}, {}}] = trainset[i].x:gt(125)
+    --features_input[{{i}, {1}, {}, {}}] = trainset[i].x:gt(125)
+
 end
 x = features_input
 --print(x)
