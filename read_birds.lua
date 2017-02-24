@@ -23,7 +23,6 @@ file_extention = ".t7"
 -- Go over all files in directory. We use an iterator, paths.files().
 for file in paths.files(dir_name) do
    -- We only load files that match the extension
-
     if file:find(file_extention .. '$') then
         -- and insert the ones we care about in our table
         table.insert(files, paths.concat(dir_name,file))

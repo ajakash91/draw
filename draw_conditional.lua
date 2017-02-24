@@ -29,6 +29,8 @@ n_data = 30
 --encoder 
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
+dir_name = ""
+file_extention = '.t7'
 
 o1 = 48
 o2 = 96
@@ -49,7 +51,19 @@ final_width = A-f1-f2-f3+3
     return(fc)
 end]]--
 
-function read_features(dir_name, file_extention)
+--[[
+f = torch.randperm(150)
+for i = 1, 10 do
+    fi[i] = files[f[i]%]
+end
+fi
+
+as = string.match(fi[7], '%d%d%d%..*%.t7') -- 190.Red_cockaded_Woodpecker.t7
+as = as:sub(1, -4) --190.Red_cockaded_Woodpecker
+
+]]--
+
+function read_data(dir_name, file_extention)
     -- Go over all files in directory. We use an iterator, paths.files().
     for file in paths.files(dir_name) do
        -- We only load files that match the extension
@@ -67,7 +81,7 @@ function read_features(dir_name, file_extention)
     -- Sorting the files
     table.sort(files, function (a,b) return a < b end)
 
-    text_features = {}
+    local text_features = {}
     for i,file in ipairs(files) do
        -- load each image
        table.insert(text_features, torch.load(file))
@@ -75,7 +89,9 @@ function read_features(dir_name, file_extention)
     --print(features)
 
     -- Read images using the filenames
-    image_features =
+    local images =
+
+    return images, text_features
 end
 
 function enc_convolution(x)
@@ -153,6 +169,8 @@ fc1_e = nn.Linear(64*20*20, rnn_size)(layer3_flat_e)]]--
 
 fc1 = enc_convolution(x)
 fc1_e = enc_convolution(x_error_prev)
+
+-- Add condition layer here. Rewrite
 
 --read end
 
@@ -288,10 +306,13 @@ testset = mnist.testdataset()
 
 features_input = torch.zeros(n_data, n_channels, A, B)
 
-for i = 1, n_data do
+--for i = 1, n_data do
     --features_input[{{i}, {1}, {}, {}}] = trainset[i].x:gt(125)
+--end
 
-end
+images, text_features = read_data(dir_name, file_extention)
+
+
 x = features_input
 --print(x)
 params, grad_params = model_utils.combine_all_parameters(encoder, decoder)
