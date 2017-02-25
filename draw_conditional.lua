@@ -17,8 +17,7 @@ n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
 n_canvas = 28*28
 seq_length = 15		--50
--- input image channels
-n_channels = 1
+n_channels = 3
 
 --N = 15				--3
 -- Image Height
