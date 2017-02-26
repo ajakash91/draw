@@ -25,10 +25,7 @@ n_channels = 3
 A = 32
 -- Image Width
 B = 32
-n_data = 25
---encoder
-x = nn.Identity()()
-x_error_prev = nn.Identity()()
+n_data = 20
 n_canvas = A*B
 
 o1 = 48
@@ -104,65 +101,24 @@ function enc_convolution(x)
 	return(fc)
 end
 
+function dec_convolution(next_h)
+	fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
+	fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
+	fc_1 = nn.ReLU()(fc_1)
+	layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
+	layer_1 = nn.ReLU()(layer_1)
+	layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
+	layer_2 = nn.ReLU()(layer_2)
+	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
+
+	return(layer_3)
+end
+
+--encoder
+x = nn.Identity()()
+x_error_prev = nn.Identity()()
+
 --read
---[[layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
-layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
-layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(32*10*10)(layer3)
-fc1 = nn.Linear(32*10*10, rnn_size)(layer3_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x_error_prev)
-layer1_e = nn.ReLU(True)(layer1_e)
-layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
-layer2_e = nn.ReLU(True)(layer2_e)
-layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
-layer3_e = nn.ReLU(True)(layer3_e)
-layer3_flat_e = nn.View(32*10*10)(layer3_e)
-fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)]]--
-
---[[layer1 = nn.SpatialConvolution(n_channels, 16, 5, 5)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(16, 32, 5, 5)(layer1)
-layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(32, 64, 5, 5)(layer2)
-layer3 = nn.ReLU()(layer3)
-layer4 = nn.SpatialConvolution(64, 128, 5, 5)(layer3)
-layer4 = nn.ReLU()(layer4)
-layer4_flat = nn.View(128*12*12)(layer4)
-fc1 = nn.Linear(128*12*12, rnn_size)(layer4_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 16, 5, 5)(x_error_prev)
-layer1_e = nn.ReLU()(layer1_e)
-layer2_e = nn.SpatialConvolution(16, 32, 5, 5)(layer1_e)
-layer2_e = nn.ReLU()(layer2_e)
-layer3_e = nn.SpatialConvolution(32, 64, 5, 5)(layer2_e)
-layer3_e = nn.ReLU()(layer3_e)
-layer4_e = nn.SpatialConvolution(64, 128, 5, 5)(layer3_e)
-layer4_e = nn.ReLU()(layer4_e)
-layer4_flat_e = nn.View(128*12*12)(layer4_e)
-fc1_e = nn.Linear(128*12*12, rnn_size)(layer4_flat_e)
-]]--
-
---[[layer1 = nn.SpatialConvolution(n_channels, 32, 5, 5)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(32, 64, 5, 5)(layer1)
-layer2 = nn.ReLU()(layer2)
---layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
---layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(64*20*20)(layer2)
-fc1 = nn.Linear(64*20*20, rnn_size)(layer3_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 32, 5, 5)(x_error_prev)
-layer1_e = nn.ReLU(True)(layer1_e)
-layer2_e = nn.SpatialConvolution(32, 64, 5, 5)(layer1_e)
-layer2_e = nn.ReLU(True)(layer2_e)
---layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
---layer3_e = nn.ReLU(True)(layer3_e)
-layer3_flat_e = nn.View(64*20*20)(layer2_e)
-fc1_e = nn.Linear(64*20*20, rnn_size)(layer3_flat_e)]]--
 
 fc1 = enc_convolution(x)
 fc1_e = enc_convolution(x_error_prev)
@@ -244,40 +200,24 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
---[[fc_1 = nn.Linear(rnn_size, 32*10*10)(next_h)
-fc_1 = nn.View(32, 10, 10)(fc_1)
-fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(32, 16, 3, 3, 2, 2, 0, 0, 1, 1)(fc_1)
-layer_1 = nn.ReLU()(layer_1)
-layer_2 = nn.SpatialFullConvolution(16, 12, 3, 3)(layer_1)
-layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(12, n_channels, 5, 5)(layer_2)]]--
 
---[[fc_1 = nn.Linear(rnn_size, 128*12*12)(next_h)
-fc_1 = nn.View(128, 12, 12)(fc_1)
-fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(128, 64, 5, 5)(fc_1)
-layer_1 = nn.ReLU()(layer_1)
-layer_2 = nn.SpatialFullConvolution(64, 32, 5, 5)(layer_1)
-layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(32, 16, 5, 5)(layer_2)
-layer_3 = nn.ReLU()(layer_3)
-layer_4 = nn.SpatialFullConvolution(16, n_channels, 5, 5)(layer_3)]]--
-
-fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
+--[[fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
 fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
 fc_1 = nn.ReLU()(fc_1)
 layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
 layer_1 = nn.ReLU()(layer_1)
 layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
+layer_3 = nn.SpatialFullConvolution(o1, n_channels*2, f1, f1)(layer_2)]]--
 
-write_layer = layer_3
+mu_prediction = dec_convolution(next_h)
+sigma_prediction = dec_convolution(next_h)
+
+--prediction = {mu_prediction, sigma_prediction}
 
 --write layer end
 
-next_canvas = nn.CAddTable()({prev_canvas, write_layer})
+next_canvas = nn.CAddTable()({prev_canvas, mu_prediction})
 
 mu = nn.Sigmoid()(next_canvas)
 
@@ -288,16 +228,19 @@ loss_x = nn.Sum(4)(d2)
 loss_x = nn.Sum(3)(loss_x)
 loss_x = nn.Sum(2)(loss_x)]]--
 
-x_prediction = nn.View(n_channels, A, B)(mu)
+mu_prediction = nn.View(n_channels, A, B)(mu_prediction)
+sigma_prediction = nn.View(n_channels, A, B)(sigma_prediction)
+--x_prediction = {mu_prediction, sigma_prediction}
+
 x_error = nn.View(n_channels, A, B)(d)
 
-decoder = nn.gModule({x, z, prev_c, prev_h, prev_canvas}, {x_prediction, x_error, next_c, next_h, next_canvas})
+decoder = nn.gModule({x, z, prev_c, prev_h, prev_canvas}, {mu_prediction, sigma_prediction, x_error, next_c, next_h, next_canvas})
 decoder = decoder:cuda()
 decoder.name = 'decoder'
 
 --train
-trainset = mnist.traindataset()
-testset = mnist.testdataset()
+--[[trainset = mnist.traindataset()
+testset = mnist.testdataset()]]--
 
 features_input = read_data()
 
@@ -326,9 +269,14 @@ function feval(x_arg)
 
 	x_error = {[0]=torch.rand(n_data, n_channels, A, B)}
 	x_prediction = {}
+	mu_prediction = {}
+	sigma_prediction = {}
 	loss_z = {}
 	loss_x = {}
-	dloss_x = {}
+	dx_prediction = {}
+	dmu_prediction = {}
+	dsigma_prediction = {}
+
 	canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
 	x = {}
 	--patch = {}
@@ -364,14 +312,23 @@ function feval(x_arg)
 		print(encoder_clones[t]:size())
 		print('encoder_clones:x')
 		print(encoder_clones[t].x:size())]]--
-
-		x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
+		--print(#z[t])
+		mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t]= unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
 		--print(patch[1]:gt(0.5))
 
-		loss_x[t] = criterion:forward(x_prediction[t], x[t])
-		dloss_x[t] = criterion:backward(x_prediction[t], x[t])
+		--print(#x[t])
+		--print(#mu_prediction[t])
+		--print(#sigma_prediction[t])
 
-		loss = loss + torch.mean(loss_z[t]) + torch.mean(loss_x[t])
+		x_prediction[t] = {mu_prediction[t], sigma_prediction[t] }
+
+		loss_x[t] = criterion:forward(x_prediction[t], x[t])
+		dx_prediction[t] = criterion:backward(x_prediction[t], x[t])
+
+		dmu_prediction[t] = dx_prediction[t][1]
+		dsigma_prediction[t] = dx_prediction[t][2]
+
+		loss = loss + torch.mean(loss_z[t]) + loss_x[t] -- torch.mean(loss_x[t])
 	end
 	loss = loss / seq_length
 	print(loss)
@@ -384,7 +341,7 @@ function feval(x_arg)
 	dlstm_h_dec = {[seq_length] = torch.zeros(n_data, rnn_size)}
 
 	dx_error = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
-	dx_prediction = {}
+	--dx_prediction = {}
 	dloss_z = {}
 	dcanvas = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
 	dz = {}
@@ -396,7 +353,7 @@ function feval(x_arg)
 	for t = seq_length,1,-1 do
 		--dloss_x[t] = torch.ones(n_data, 1):cuda()
 		dloss_z[t] = torch.ones(n_data, 1):cuda()
-		dx_prediction[t] = torch.zeros(n_data, n_channels, A, B):cuda()
+		--dx_prediction[t] = torch.zeros(n_data, n_channels, A, B):cuda()
 		--dpatch[t] = torch.zeros(n_data, N, N):cuda()
 
 		dx_error[t] = dx_error[t]:cuda()
@@ -407,7 +364,7 @@ function feval(x_arg)
 		dlstm_c_enc[t] = dlstm_c_enc[t]:cuda()
 		dlstm_h_enc[t] = dlstm_h_enc[t]:cuda()
 
-		dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1], dcanvas[t-1] = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dx_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t]}))
+		dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1], dcanvas[t-1] = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t]}))
 		dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t] = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t]}))
 
 	end
@@ -446,8 +403,8 @@ for t = 1, seq_length do
 	e[t] = torch.randn(n_data, n_z):cuda()
 	x[t] = features_input:cuda()
 	z[t] = torch.randn(n_data, n_z):cuda()
-	x_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
+	mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t], loss_x[t] = unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
+	x_prediction[t] = {mu_prediction[t], sigma_prediction[t]}
 end
 
 torch.save('x_generation', x_prediction)
-
