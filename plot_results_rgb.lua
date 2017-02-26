@@ -19,9 +19,9 @@ x = torch.zeros(#x_prediction, x_prediction[1][1]:size(2), x_prediction[1][1]:si
 --x = torch.zeros(#x_prediction, x_prediction[1]:size(2), x_prediction[1]:size(3))
 x = x:cuda()
 for i = 1, x_prediction[1][1]:size(1) do
-  for t = 1, #x_prediction do
-    x[{{t}, {}, {}, {}}] = x_prediction[t][1][i]:cuda()
-    --x[{{t}, {}, {}}] = x_prediction[t][i]:cuda()
-  end
-  image.display(x)
+    for t = 1, #x_prediction do
+        x[{{t}, {}, {}, {}}] = x_prediction[t][1][i]:cuda()
+        --x[{{t}, {}, {}}] = x_prediction[t][i]:cuda()
+    end
+    image.display(x)
 end

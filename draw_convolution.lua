@@ -30,7 +30,7 @@ n_data = 30
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
-o1 =
+o1 = 32
 o2 = 64
 o3 = 128
 f1 = 5
@@ -241,10 +241,10 @@ mu = nn.Sigmoid()(next_canvas)
 
 neg_mu = nn.MulConstant(-1)(mu)
 d = nn.CAddTable()({x, neg_mu})
---[[d2 = nn.Power(2)(d)
+d2 = nn.Power(2)(d)
 loss_x = nn.Sum(4)(d2)
 loss_x = nn.Sum(3)(loss_x)
-loss_x = nn.Sum(2)(loss_x)]]--
+loss_x = nn.Sum(2)(loss_x)
 
 x_prediction = nn.View(n_channels, A, B)(mu)
 x_error = nn.View(n_channels, A, B)(d)

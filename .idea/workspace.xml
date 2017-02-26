@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conditional.lua" afterPath="$PROJECT_DIR$/draw_conditional.lua" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_convolution_rgb.lua" afterPath="$PROJECT_DIR$/draw_convolution_rgb.lua" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_convolution.lua" afterPath="$PROJECT_DIR$/draw_convolution.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot_results_rgb.lua" afterPath="$PROJECT_DIR$/plot_results_rgb.lua" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -25,8 +24,8 @@
       <file leaf-file-name="draw_convolution_rgb.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="398" column="39" lean-forward="false" selection-start-line="398" selection-start-column="27" selection-end-line="398" selection-end-column="39" />
+            <state relative-caret-position="236">
+              <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
               <folding>
                 <element signature="e#1751#2098#0" expanded="false" />
                 <element signature="e#6076#6178#0" expanded="false" />
@@ -40,7 +39,7 @@
         <entry file="file://$PROJECT_DIR$/draw_conditional.lua">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-36">
-              <caret line="381" column="6" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
+              <caret line="378" column="6" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
               <folding>
                 <element signature="e#609#977#0" expanded="false" />
                 <element signature="e#2555#3302#0" expanded="false" />
@@ -58,42 +57,22 @@
         <entry file="file://$PROJECT_DIR$/draw_attention.lua">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2759">
-              <caret line="337" column="0" lean-forward="false" selection-start-line="337" selection-start-column="0" selection-end-line="337" selection-end-column="0" />
+              <caret line="333" column="0" lean-forward="false" selection-start-line="333" selection-start-column="0" selection-end-line="333" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="draw_convolution.lua" pinned="false" current-in-tab="false">
+      <file leaf-file-name="draw_convolution.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-810">
-              <caret line="243" column="4" lean-forward="false" selection-start-line="243" selection-start-column="4" selection-end-line="243" selection-end-column="4" />
+            <state relative-caret-position="235">
+              <caret line="35" column="5" lean-forward="false" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
               <folding>
-                <element signature="e#6166#6530#0" expanded="false" />
-                <element signature="e#6534#6971#0" expanded="false" />
-                <element signature="e#9577#9977#0" expanded="false" />
+                <element signature="e#6169#6533#0" expanded="false" />
+                <element signature="e#6537#6974#0" expanded="false" />
+                <element signature="e#9572#9972#0" expanded="false" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="plot_results_no_binarization.lua" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/plot_results_no_binarization.lua">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="396">
-              <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="plot_results_rgb.lua" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="486">
-              <caret line="26" column="3" lean-forward="true" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -143,13 +122,13 @@
         <option value="$PROJECT_DIR$/code_test.lua" />
         <option value="$PROJECT_DIR$/read_birds.lua" />
         <option value="$PROJECT_DIR$/draw_convolution_rgb_test.lua" />
-        <option value="$PROJECT_DIR$/draw_convolution.lua" />
         <option value="$PROJECT_DIR$/draw_attention.lua" />
         <option value="$PROJECT_DIR$/plot_results_no_binarization.lua" />
         <option value="$PROJECT_DIR$/GaussianCriterion.lua" />
         <option value="$PROJECT_DIR$/draw_conditional.lua" />
         <option value="$PROJECT_DIR$/draw_convolution_rgb.lua" />
         <option value="$PROJECT_DIR$/plot_results_rgb.lua" />
+        <option value="$PROJECT_DIR$/draw_convolution.lua" />
       </list>
     </option>
   </component>
@@ -451,9 +430,9 @@
         <state relative-caret-position="144">
           <caret line="8" column="17" lean-forward="true" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
           <folding>
-            <element signature="e#6166#6530#0" expanded="false" />
-            <element signature="e#6534#6971#0" expanded="false" />
-            <element signature="e#9577#9977#0" expanded="false" />
+            <element signature="e#6169#6533#0" expanded="false" />
+            <element signature="e#6537#6974#0" expanded="false" />
+            <element signature="e#9572#9972#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -471,9 +450,9 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#6166#6530#0" expanded="false" />
-            <element signature="e#6534#6971#0" expanded="false" />
-            <element signature="e#9577#9977#0" expanded="false" />
+            <element signature="e#6169#6533#0" expanded="false" />
+            <element signature="e#6537#6974#0" expanded="false" />
+            <element signature="e#9572#9972#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -531,14 +510,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_attention.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2759">
-          <caret line="337" column="0" lean-forward="false" selection-start-line="337" selection-start-column="0" selection-end-line="337" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -547,10 +518,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="41" lean-forward="true" selection-start-line="12" selection-start-column="41" selection-end-line="12" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot_results_no_binarization.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="16" column="33" lean-forward="true" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+          <folding>
+            <element signature="e#1751#2098#0" expanded="false" />
+            <element signature="e#6076#6178#0" expanded="false" />
+            <element signature="e#8183#8568#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/draw_conditional.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-36">
-          <caret line="381" column="6" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
+          <caret line="378" column="6" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="459" selection-end-column="0" />
           <folding>
             <element signature="e#609#977#0" expanded="false" />
             <element signature="e#2555#3302#0" expanded="false" />
@@ -563,43 +562,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
+    <entry file="file://$PROJECT_DIR$/draw_attention.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="398" column="39" lean-forward="false" selection-start-line="398" selection-start-column="27" selection-end-line="398" selection-end-column="39" />
-          <folding>
-            <element signature="e#1751#2098#0" expanded="false" />
-            <element signature="e#6076#6178#0" expanded="false" />
-            <element signature="e#8183#8568#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="2759">
+          <caret line="333" column="0" lean-forward="false" selection-start-line="333" selection-start-column="0" selection-end-line="333" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/draw_convolution.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-810">
-          <caret line="243" column="4" lean-forward="false" selection-start-line="243" selection-start-column="4" selection-end-line="243" selection-end-column="4" />
+        <state relative-caret-position="235">
+          <caret line="35" column="5" lean-forward="false" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
           <folding>
-            <element signature="e#6166#6530#0" expanded="false" />
-            <element signature="e#6534#6971#0" expanded="false" />
-            <element signature="e#9577#9977#0" expanded="false" />
+            <element signature="e#6169#6533#0" expanded="false" />
+            <element signature="e#6537#6974#0" expanded="false" />
+            <element signature="e#9572#9972#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/plot_results_no_binarization.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="22" column="4" lean-forward="false" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="26" column="3" lean-forward="true" selection-start-line="26" selection-start-column="3" selection-end-line="26" selection-end-column="3" />
-          <folding />
         </state>
       </provider>
     </entry>
