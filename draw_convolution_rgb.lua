@@ -331,7 +331,7 @@ function feval(x_arg)
 		loss = loss + torch.mean(loss_z[t]) + loss_x[t] -- torch.mean(loss_x[t])
 	end
 	loss = loss / seq_length
-	print(loss)
+	--print(loss)
 
 	------------------ backward pass -------------------
 	-- complete reverse order of the above
