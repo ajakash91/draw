@@ -43,7 +43,7 @@ function read_data()
 		-- We only load files that match the extension
 		if file:find('.jpg' .. '$') then
 			-- and insert the ones we care about in our table
-			table.insert(files, paths.concat('/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/',file))
+			table.insert(files, paths.concat('/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/', file))
 		end
 	end
 
@@ -52,26 +52,13 @@ function read_data()
 		error('given directory doesnt contain any files of type: ' .. opt.ext)
 	end
 
-	-- Sorting the files
-	--table.sort(files, function (a,b) return a < b end)
-
-	--[[local text_features = {}
-	for i,file in ipairs(files) do
-	   -- load each image
-	   table.insert(text_features, torch.load(file))
-	end]]--
-	--print(features)
-
-	-- Read images using the filenames
-	local images = {}
-
 	features = torch.zeros(n_data, n_channels, A, B)
 
 	--read images and resize to 32x32 and read images
 	for i = 1, n_data do
 		img = image.load(files[i], 3)
 		img = image.scale(img, A, B)
-		features[{{i}, {}, {}, {}}] = img:gt(0.5)
+		features[{{i}, {}, {}, {}}] = img--:gt(0.5)
 	end
 
 	return features
@@ -382,11 +369,11 @@ end
 lr = 1e-2
 optim_state = {learningRate = lr}
 
-for i = 1, 1000 do
-	if i % 200 == 0 then
-		lr = lr / 2
+for i = 1, 50 do
+	--[[if i % 200 == 0 then
+		lr = lr / 5
 		optim_state = {learningRate = lr}
-	end
+	end]]--
 
 	local _, loss = optim.adagrad(feval, params, optim_state)
 
