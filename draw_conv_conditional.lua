@@ -81,13 +81,9 @@ function read_data()
             end
         end
     end
-    print(image_features:size())
-    print(text_features:size())
+    --print(image_features:size())
+    --print(text_features:size())
     return image_features, text_features
-end
-
-function read_txt_data()
-
 end
 
 function enc_convolution(x)
@@ -318,7 +314,7 @@ function feval(x_arg)
         dmu_prediction[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
 
-        loss = loss + torch.mean(loss_z[t]) + loss_x[t] -- torch.mean(loss_x[t])
+        loss = loss + torch.mean(loss_z[t]) + (loss_x[t] / (n_channels*A*B))-- torch.mean(loss_x[t])
     end
     loss = loss / seq_length
     --print(loss)

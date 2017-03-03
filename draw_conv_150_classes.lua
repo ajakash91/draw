@@ -5,7 +5,7 @@ require 'nngraph'
 require 'optim'
 require 'image'
 local model_utils=require 'model_utils'
-local mnist = require 'mnist'
+--local mnist = require 'mnist'
 require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
@@ -15,14 +15,14 @@ require 'GaussianCriterion'
 Tensor = torch.CudaTensor
 
 -- number of classes and examples per class in a batch for training
-n_classes = 3
+n_classes = 2
 n_samples = 4
 
 -- Network hyperparameters
 text_feat_size = 1024
-n_z = 400			--20    --400
+n_z = 350			--20    --400
 rnn_size = 1024		--100   --1024
-seq_length = 10		--50
+seq_length = 5		--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -33,13 +33,13 @@ B = 32
 n_data = n_classes*n_samples
 n_canvas = A*B
 
-o1 = 48
-o2 = 96
-o3 = 128
-f1 = 5
+o1 = 32
+o2 = 32
+--o3 = 32
+f1 = 3
 f2 = 3
-f3 = 3
-final_width = A-f1-f2-f3+3
+--f3 = 3
+final_width = A-f1-f2+2
 
 text_dir = '/cs/vml4/zhiweid/ICML17/Reed_cvpr16/txt_im_pair/'
 
@@ -63,52 +63,46 @@ function read_data()
     local file_rand = torch.randperm(150)--#file_list)
 
     image_features = torch.zeros(n_data, n_channels, A, B)
-    text_features = torch.zeros(n_data, 10, text_feat_size)
+    --text_features = torch.zeros(n_data, 10, text_feat_size)
 
     for i = 1, n_classes do
         -- Read image and text data for all samples in the class
         --print(file_list[file_rand[i]])
         full_image_data = torch.load(file_list[file_rand[i]])
-        text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
-        --print(text_file)
-        full_text_data = torch.load(paths.concat(text_dir, text_file))
+        --text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
+        --full_text_data = torch.load(paths.concat(text_dir, text_file))
 
         -- Read n_samples random samples from each class
         sample_rand = torch.randperm(full_image_data:size(1))
         for j = 1, n_samples do
             image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[sample_rand[j]]
-            for k = 1, 10 do
+            --[[for k = 1, 10 do
                 text_features[{{(i-1)*n_samples+j}, {k}, {}}] = full_text_data['txt_fea'][(sample_rand[j]-1)*10 + k]
-            end
+            end]]--
         end
     end
     --print(image_features:size())
     --print(text_features:size())
-    return image_features, text_features
+    return image_features
 end
 
 function enc_convolution(x)
-    layer1 = nn.SpatialConvolution(n_channels, o1, f1, f1)(x)
-    layer1 = nn.ReLU()(layer1)
-    layer2 = nn.SpatialConvolution(o1, o2, f2, f2)(layer1)
-    layer2 = nn.ReLU()(layer2)
-    layer3 = nn.SpatialConvolution(o2, o3, f3, f3)(layer2)
-    layer3 = nn.ReLU()(layer3)
-    layer3_flat = nn.View(o3*(final_width)*(final_width))(layer3)
-    fc = nn.Linear(o3*(final_width)*(final_width), rnn_size)(layer3_flat)
+	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
+	layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
+	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
+	layer3_flat = nn.View(o2*(final_width)*(final_width))(layer2)
+	fc = nn.ReLU()(nn.Linear(o2*(final_width)*(final_width), rnn_size)(layer3_flat))
 
     return(fc)
 end
 
 function dec_convolution(next_h)
-    fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
-    fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
-    fc_1 = nn.ReLU()(fc_1)
-    layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
-    layer_1 = nn.ReLU()(layer_1)
-    layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
-    layer_2 = nn.ReLU()(layer_2)
-    layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
+	fc_1 = nn.Linear(rnn_size, o2*(final_width)*(final_width))(next_h)
+	fc_1 = nn.View(o2, (final_width), (final_width))(fc_1)
+	fc_1 = nn.ReLU()(fc_1)
+	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
+	layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
+	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
 
     return(layer_3)
 end
@@ -117,14 +111,10 @@ end
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
---read
-
 fc1 = enc_convolution(x)
 fc1_e = enc_convolution(x_error_prev)
 
---read end
-
-input = nn.JoinTable(2)({fc1, fc1_e})
+input = nn.JoinTable(1)({fc1, fc1_e})
 input = nn.View(rnn_size*2)(input)
 n_input = rnn_size*2
 
@@ -165,7 +155,7 @@ loss_z = nn.CAddTable()({mu_squared, sigma_squared, minus_log_sigma})
 loss_z = nn.AddConstant(-1)(loss_z)
 loss_z = nn.MulConstant(0.5)(loss_z)
 loss_z = nn.Sum(2)(loss_z)
-encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e}, {z, loss_z, next_c, next_h, patch})
+encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e}, {z, loss_z, next_c, next_h})
 encoder = encoder:cuda()
 encoder.name = 'encoder'
 
@@ -199,18 +189,8 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
-
---[[fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
-fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
-fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
-layer_1 = nn.ReLU()(layer_1)
-layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
-layer_2 = nn.ReLU()(layer_2)
-layer_3 = nn.SpatialFullConvolution(o1, n_channels*2, f1, f1)(layer_2)]]--
-
-mu_prediction = dec_convolution(next_h)
-sigma_prediction = dec_convolution(next_h)
+mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
+sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
 
 --write layer end
 
@@ -240,7 +220,7 @@ criterion = nn.GaussianCriterion()
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
     -- Read images
-    img_features_input, txt_features_input = read_data()
+    img_features_input = read_data()
 
     if x_arg ~= params then
         params:copy(x_arg)
@@ -315,13 +295,14 @@ function feval(x_arg)
         dmu_prediction[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
 
-        loss = loss + torch.mean(loss_z[t]) + loss_x[t] -- torch.mean(loss_x[t])
+        loss = loss + torch.mean(loss_z[t]) + (loss_x[t] / (n_channels * A * B)) -- torch.mean(loss_x[t])
     end
     loss = loss / seq_length
     --print(loss)
     --print(mu_prediction[1]:size())
     for ind = 1, n_data do
-        image.save('tmp/sample_reconstruction'..ind ..'.jpg', mu_prediction[seq_length][ind])
+        image.save('tmp/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+        image.save('tmp/sample_'..ind ..'.jpg', x[seq_length][ind])
     end
     ------------------ backward pass -------------------
     -- complete reverse order of the above
@@ -356,7 +337,6 @@ function feval(x_arg)
 
         dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1], dcanvas[t-1] = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t]}))
         dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t] = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t]}))
-
     end
 
     -- clip gradient element-wise
@@ -372,23 +352,43 @@ end
 lr = 1e-2
 optim_state = {learningRate = lr}
 
-for i = 1, 10000 do
-    if i % 2000 == 0 then
-        lr = lr / 2
+train_losses = {}
+val_losses = {}
+
+for i = 1, 300000 do
+    if i % 10000 == 0 then
+        lr = lr / 1.9
         optim_state = {learningRate = lr}
     end
 
     local _, loss = optim.adagrad(feval, params, optim_state)
+    local train_loss = loss[1]
+    train_losses[i] = train_loss
 
-    if i % 10 == 0 then
+    if i % 100 == 0 then
         print(string.format("iteration %4d, loss = %6.6f", i, loss[1]))
         --print(params)
     end
 
+    if i % 25000 == 0 or i == 300000 then
+        -- evaluate loss on validation data
+        local val_loss = 0
+        val_losses[i] = val_loss
+
+        local savefile = string.format('output/chk_%d_%.5f_.t7', i, lr)
+        print('saving checkpoint to output/' .. savefile)
+
+        local checkpoint = {}
+        checkpoint.encoder = encoder
+        checkpoint.decoder = decoder
+        checkpoint.train_losses = train_losses
+        checkpoint.val_losses = val_losses
+        checkpoint.i = i
+        torch.save(savefile, checkpoint)
+    end
 end
 
 torch.save('x_prediction', x_prediction)
-torch.save()
 
 --generation
 for t = 1, seq_length do

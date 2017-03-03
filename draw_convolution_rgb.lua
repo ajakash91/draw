@@ -16,7 +16,7 @@ Tensor = torch.CudaTensor
 
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 15		--50
+seq_length = 5		--50
 -- input image channels
 n_channels = 3
 
@@ -28,13 +28,13 @@ B = 32
 n_data = 20
 n_canvas = A*B
 
-o1 = 48
-o2 = 96
-o3 = 128
-f1 = 5
+o1 = 16
+o2 = 32
+--o3 = 64
+f1 = 3
 f2 = 3
-f3 = 3
-final_width = A-f1-f2-f3+3
+--f3 = 3
+final_width = A-f1-f2+2
 
 function read_data()
 	-- Go over all files in directory. We use an iterator, paths.files().
@@ -76,28 +76,21 @@ end
 end]]--
 
 function enc_convolution(x)
-	layer1 = nn.SpatialConvolution(n_channels, o1, f1, f1)(x)
-	layer1 = nn.ReLU()(layer1)
-	layer2 = nn.SpatialConvolution(o1, o2, f2, f2)(layer1)
-	layer2 = nn.ReLU()(layer2)
-	layer3 = nn.SpatialConvolution(o2, o3, f3, f3)(layer2)
-	layer3 = nn.ReLU()(layer3)
-	layer3_flat = nn.View(o3*(final_width)*(final_width))(layer3)
-	fc = nn.Linear(o3*(final_width)*(final_width), rnn_size)(layer3_flat)
-
+	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
+	layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
+	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
+	layer3_flat = nn.View(o2*(final_width)*(final_width))(layer2)
+	fc = nn.ReLU()(nn.Linear(o2*(final_width)*(final_width), rnn_size)(layer3_flat))
 	return(fc)
 end
 
 function dec_convolution(next_h)
-	fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
-	fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
+	fc_1 = nn.Linear(rnn_size, o2*(final_width)*(final_width))(next_h)
+	fc_1 = nn.View(o2, (final_width), (final_width))(fc_1)
 	fc_1 = nn.ReLU()(fc_1)
-	layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
-	layer_1 = nn.ReLU()(layer_1)
-	layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
-	layer_2 = nn.ReLU()(layer_2)
+	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
+	layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
 	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
-
 	return(layer_3)
 end
 
@@ -105,12 +98,8 @@ end
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
---read
-
 fc1 = enc_convolution(x)
 fc1_e = enc_convolution(x_error_prev)
-
---read end
 
 input = nn.JoinTable(2)({fc1, fc1_e})
 input = nn.View(rnn_size*2)(input)
@@ -153,7 +142,7 @@ loss_z = nn.CAddTable()({mu_squared, sigma_squared, minus_log_sigma})
 loss_z = nn.AddConstant(-1)(loss_z)
 loss_z = nn.MulConstant(0.5)(loss_z)
 loss_z = nn.Sum(2)(loss_z)
-encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e}, {z, loss_z, next_c, next_h, patch})
+encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e}, {z, loss_z, next_c, next_h})
 encoder = encoder:cuda()
 encoder.name = 'encoder'
 
@@ -197,8 +186,8 @@ layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
 layer_2 = nn.ReLU()(layer_2)
 layer_3 = nn.SpatialFullConvolution(o1, n_channels*2, f1, f1)(layer_2)]]--
 
-mu_prediction = dec_convolution(next_h)
-sigma_prediction = dec_convolution(next_h)
+mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
+sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
 
 --prediction = {mu_prediction, sigma_prediction}
 
@@ -315,7 +304,7 @@ function feval(x_arg)
 		dmu_prediction[t] = dx_prediction[t][1]
 		dsigma_prediction[t] = dx_prediction[t][2]
 
-		loss = loss + torch.mean(loss_z[t]) + loss_x[t] -- torch.mean(loss_x[t])
+		loss = loss + torch.mean(loss_z[t]) + (loss_x[t]/(A*B*n_channels)) -- torch.mean(loss_x[t])
 	end
 	loss = loss / seq_length
 	--print(loss)
@@ -369,11 +358,11 @@ end
 lr = 1e-2
 optim_state = {learningRate = lr}
 
-for i = 1, 50 do
-	--[[if i % 200 == 0 then
+for i = 1, 1000 do
+	if i % 200 == 0 then
 		lr = lr / 5
 		optim_state = {learningRate = lr}
-	end]]--
+	end
 
 	local _, loss = optim.adagrad(feval, params, optim_state)
 
