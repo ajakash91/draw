@@ -28,13 +28,13 @@ B = 32
 n_data = 20
 n_canvas = A*B
 
-o1 = 16
-o2 = 32
+o1 = 12
+--o2 = 32
 --o3 = 64
-f1 = 3
-f2 = 3
+f1 = 5
+--f2 = 3
 --f3 = 3
-final_width = A-f1-f2+2
+final_width = torch.floor((A-f1)/2)+1
 
 function read_data()
 	-- Go over all files in directory. We use an iterator, paths.files().
@@ -76,21 +76,21 @@ end
 end]]--
 
 function enc_convolution(x)
-	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
-	layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
+	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1, 2, 2)(x))
+	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
 	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
-	layer3_flat = nn.View(o2*(final_width)*(final_width))(layer2)
-	fc = nn.ReLU()(nn.Linear(o2*(final_width)*(final_width), rnn_size)(layer3_flat))
+	layer3_flat = nn.View(o1*(final_width)*(final_width))(layer1)
+	fc = nn.ReLU()(nn.Linear(o1*(final_width)*(final_width), rnn_size)(layer3_flat))
 	return(fc)
 end
 
 function dec_convolution(next_h)
-	fc_1 = nn.Linear(rnn_size, o2*(final_width)*(final_width))(next_h)
-	fc_1 = nn.View(o2, (final_width), (final_width))(fc_1)
+	fc_1 = nn.Linear(rnn_size, o1*(final_width)*(final_width))(next_h)
+	fc_1 = nn.View(o1, (final_width), (final_width))(fc_1)
 	fc_1 = nn.ReLU()(fc_1)
 	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
-	layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
-	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
+	--layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
+	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1, 2, 2, 0, 0, 1, 1)(fc_1)
 	return(layer_3)
 end
 
@@ -229,6 +229,11 @@ decoder_clones = model_utils.clone_many_times(decoder, seq_length)
 
 criterion = nn.GaussianCriterion()
 
+for ind = 1, n_data do
+	--image.save('tmp/sample_reconstruction_alb'..ind ..'.jpg', mu_prediction[seq_length][ind])
+	image.save('tmp/sample_alb'..ind ..'.jpg', features_input[ind])
+end
+print_count = 0
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
 	if x_arg ~= params then
@@ -307,6 +312,14 @@ function feval(x_arg)
 		loss = loss + torch.mean(loss_z[t]) + (loss_x[t]/(A*B*n_channels)) -- torch.mean(loss_x[t])
 	end
 	loss = loss / seq_length
+
+	print_count = print_count + 1
+	if print_count % 25 == 0 then
+		for ind = 1, n_data do
+			image.save('tmp/sample_reconstruction_alb'..ind ..'.jpg', mu_prediction[seq_length][ind])
+			--image.save('tmp/sample_alb'..ind ..'.jpg', x[seq_length][ind])
+		end
+	end
 	--print(loss)
 
 	------------------ backward pass -------------------
@@ -355,16 +368,16 @@ end
 -- optimization loop
 --
 
-lr = 1e-2
+lr = 5e-4
 optim_state = {learningRate = lr}
 
-for i = 1, 1000 do
-	if i % 200 == 0 then
+for i = 1, 2000 do
+	--[[if i % 2000 == 0 then
 		lr = lr / 5
 		optim_state = {learningRate = lr}
-	end
+	end]]--
 
-	local _, loss = optim.adagrad(feval, params, optim_state)
+	local _, loss = optim.adam(feval, params, optim_state)
 
 	if i % 10 == 0 then
 		print(string.format("iteration %4d, loss = %6.6f", i, loss[1]))

@@ -15,13 +15,13 @@ require 'GaussianCriterion'
 Tensor = torch.CudaTensor
 
 -- number of classes and examples per class in a batch for training
-n_classes = 2
-n_samples = 4
+n_classes = 4
+n_samples = 10
 
 -- Network hyperparameters
 text_feat_size = 1024
-n_z = 350			--20    --400
-rnn_size = 1024		--100   --1024
+n_z = 200			--20    --400
+rnn_size = 256		--100   --1024
 seq_length = 5		--50
 -- input image channels
 n_channels = 3
@@ -33,13 +33,13 @@ B = 32
 n_data = n_classes*n_samples
 n_canvas = A*B
 
-o1 = 32
-o2 = 32
+o1 = 12
+--o2 = 32
 --o3 = 32
-f1 = 3
-f2 = 3
+f1 = 5
+--f2 = 3
 --f3 = 3
-final_width = A-f1-f2+2
+final_width = A-f1+1
 
 text_dir = '/cs/vml4/zhiweid/ICML17/Reed_cvpr16/txt_im_pair/'
 
@@ -88,21 +88,21 @@ end
 
 function enc_convolution(x)
 	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
-	layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
+	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
 	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
-	layer3_flat = nn.View(o2*(final_width)*(final_width))(layer2)
-	fc = nn.ReLU()(nn.Linear(o2*(final_width)*(final_width), rnn_size)(layer3_flat))
+	layer3_flat = nn.View(o1*(final_width)*(final_width))(layer1)
+	fc = nn.ReLU()(nn.Linear(o1*(final_width)*(final_width), rnn_size)(layer3_flat))
 
     return(fc)
 end
 
 function dec_convolution(next_h)
-	fc_1 = nn.Linear(rnn_size, o2*(final_width)*(final_width))(next_h)
-	fc_1 = nn.View(o2, (final_width), (final_width))(fc_1)
+	fc_1 = nn.Linear(rnn_size, o1*(final_width)*(final_width))(next_h)
+	fc_1 = nn.View(o1, (final_width), (final_width))(fc_1)
 	fc_1 = nn.ReLU()(fc_1)
 	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
-	layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
-	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
+	--layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
+	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(fc_1)
 
     return(layer_3)
 end
@@ -217,6 +217,7 @@ decoder_clones = model_utils.clone_many_times(decoder, seq_length)
 
 criterion = nn.GaussianCriterion()
 
+print_count = 0
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
     -- Read images
@@ -279,13 +280,7 @@ function feval(x_arg)
         print(encoder_clones[t]:size())
         print('encoder_clones:x')
         print(encoder_clones[t].x:size())]]--
-        --print(#z[t])
         mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t]= unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
-        --print(patch[1]:gt(0.5))
-
-        --print(#x[t])
-        --print(#mu_prediction[t])
-        --print(#sigma_prediction[t])
 
         x_prediction[t] = {mu_prediction[t], sigma_prediction[t] }
 
@@ -300,10 +295,14 @@ function feval(x_arg)
     loss = loss / seq_length
     --print(loss)
     --print(mu_prediction[1]:size())
-    for ind = 1, n_data do
-        image.save('tmp/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
-        image.save('tmp/sample_'..ind ..'.jpg', x[seq_length][ind])
+    print_count = print_count + 1
+    if print_count % 100 == 0 then
+        for ind = 1, n_data do
+            image.save('tmp/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/sample_'..ind ..'.jpg', x[seq_length][ind])
+        end
     end
+
     ------------------ backward pass -------------------
     -- complete reverse order of the above
     dlstm_c_enc = {[seq_length] = torch.zeros(n_data, rnn_size)}
@@ -349,19 +348,19 @@ end
 -- optimization loop
 --
 
-lr = 1e-2
+lr = 5e-4
 optim_state = {learningRate = lr}
 
 train_losses = {}
 val_losses = {}
 
 for i = 1, 300000 do
-    if i % 10000 == 0 then
+    if i % 30000 == 0 then
         lr = lr / 1.9
         optim_state = {learningRate = lr}
     end
 
-    local _, loss = optim.adagrad(feval, params, optim_state)
+    local _, loss = optim.adam(feval, params, optim_state)
     local train_loss = loss[1]
     train_losses[i] = train_loss
 

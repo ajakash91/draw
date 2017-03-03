@@ -16,7 +16,7 @@ Tensor = torch.CudaTensor
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
 n_canvas = 28*28
-seq_length = 15		--50
+seq_length = 10	--50
 -- input image channels
 n_channels = 1
 
@@ -31,12 +31,12 @@ x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
 o1 = 32
-o2 = 64
-o3 = 128
-f1 = 5
-f2 = 2
-f3 = 2
-final_width = A-f1-f2-f3+3
+o2 = 32
+--o3 = 64
+f1 = 3
+f2 = 3
+--f3 = 2
+final_width = A-f1-f2+2
 
 --[[function enc_convolution(x)
     layer1 = nn.SpatialConvolution(n_channels, o1, f1, f1)(x)
@@ -54,73 +54,13 @@ function enc_convolution(x)
     layer1 = nn.ReLU()(layer1)
     layer2 = nn.SpatialConvolution(o1, o2, f2, f2)(layer1)
     layer2 = nn.ReLU()(layer2)
-    layer3 = nn.SpatialConvolution(o2, o3, f3, f3)(layer2)
-    layer3 = nn.ReLU()(layer3)
-    layer3_flat = nn.View(o3*(final_width)*(final_width))(layer3)
-    fc = nn.Linear(o3*(final_width)*(final_width), rnn_size)(layer3_flat)
+    --layer3 = nn.SpatialConvolution(o2, o3, f3, f3)(layer2)
+    --layer3 = nn.ReLU()(layer3)
+    layer3_flat = nn.View(o2*(final_width)*(final_width))(layer2)
+    fc = nn.Linear(o2*(final_width)*(final_width), rnn_size)(layer3_flat)
 
     return(fc)
 end
-
---read
---[[layer1 = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(12, 16, 3, 3)(layer1)
-layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
-layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(32*10*10)(layer3)
-fc1 = nn.Linear(32*10*10, rnn_size)(layer3_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 12, 5, 5, 1, 1)(x_error_prev)
-layer1_e = nn.ReLU(True)(layer1_e)
-layer2_e = nn.SpatialConvolution(12, 16, 3, 3)(layer1_e)
-layer2_e = nn.ReLU(True)(layer2_e)
-layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
-layer3_e = nn.ReLU(True)(layer3_e)
-layer3_flat_e = nn.View(32*10*10)(layer3_e)
-fc1_e = nn.Linear(32*10*10, rnn_size)(layer3_flat_e)]]--
-
---[[layer1 = nn.SpatialConvolution(n_channels, 16, 5, 5)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(16, 32, 5, 5)(layer1)
-layer2 = nn.ReLU()(layer2)
-layer3 = nn.SpatialConvolution(32, 64, 5, 5)(layer2)
-layer3 = nn.ReLU()(layer3)
-layer4 = nn.SpatialConvolution(64, 128, 5, 5)(layer3)
-layer4 = nn.ReLU()(layer4)
-layer4_flat = nn.View(128*12*12)(layer4)
-fc1 = nn.Linear(128*12*12, rnn_size)(layer4_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 16, 5, 5)(x_error_prev)
-layer1_e = nn.ReLU()(layer1_e)
-layer2_e = nn.SpatialConvolution(16, 32, 5, 5)(layer1_e)
-layer2_e = nn.ReLU()(layer2_e)
-layer3_e = nn.SpatialConvolution(32, 64, 5, 5)(layer2_e)
-layer3_e = nn.ReLU()(layer3_e)
-layer4_e = nn.SpatialConvolution(64, 128, 5, 5)(layer3_e)
-layer4_e = nn.ReLU()(layer4_e)
-layer4_flat_e = nn.View(128*12*12)(layer4_e)
-fc1_e = nn.Linear(128*12*12, rnn_size)(layer4_flat_e)
-]]--
-
---[[layer1 = nn.SpatialConvolution(n_channels, 32, 5, 5)(x)
-layer1 = nn.ReLU()(layer1)
-layer2 = nn.SpatialConvolution(32, 64, 5, 5)(layer1)
-layer2 = nn.ReLU()(layer2)
---layer3 = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2)
---layer3 = nn.ReLU()(layer3)
-layer3_flat = nn.View(64*20*20)(layer2)
-fc1 = nn.Linear(64*20*20, rnn_size)(layer3_flat)
-
-layer1_e = nn.SpatialConvolution(n_channels, 32, 5, 5)(x_error_prev)
-layer1_e = nn.ReLU(True)(layer1_e)
-layer2_e = nn.SpatialConvolution(32, 64, 5, 5)(layer1_e)
-layer2_e = nn.ReLU(True)(layer2_e)
---layer3_e = nn.SpatialConvolution(16, 32, 3, 3, 2, 2)(layer2_e)
---layer3_e = nn.ReLU(True)(layer3_e)
-layer3_flat_e = nn.View(64*20*20)(layer2_e)
-fc1_e = nn.Linear(64*20*20, rnn_size)(layer3_flat_e)]]--
 
 fc1 = enc_convolution(x)
 fc1_e = enc_convolution(x_error_prev)
@@ -222,12 +162,12 @@ layer_3 = nn.SpatialFullConvolution(32, 16, 5, 5)(layer_2)
 layer_3 = nn.ReLU()(layer_3)
 layer_4 = nn.SpatialFullConvolution(16, n_channels, 5, 5)(layer_3)]]--
 
-fc_1 = nn.Linear(rnn_size, o3*(final_width)*(final_width))(next_h)
-fc_1 = nn.View(o3, (final_width), (final_width))(fc_1)
+fc_1 = nn.Linear(rnn_size, o2*(final_width)*(final_width))(next_h)
+fc_1 = nn.View(o2, (final_width), (final_width))(fc_1)
 fc_1 = nn.ReLU()(fc_1)
-layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
-layer_1 = nn.ReLU()(layer_1)
-layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(layer_1)
+--layer_1 = nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1)
+--layer_1 = nn.ReLU()(layer_1)
+layer_2 = nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1)
 layer_2 = nn.ReLU()(layer_2)
 layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(layer_2)
 
@@ -268,6 +208,11 @@ params, grad_params = model_utils.combine_all_parameters(encoder, decoder)
 
 encoder_clones = model_utils.clone_many_times(encoder, seq_length)
 decoder_clones = model_utils.clone_many_times(decoder, seq_length)
+
+--[[for ind = 1, n_data do
+    --image.save('tmp/sample_reconstruction_alb'..ind ..'.jpg', mu_prediction[seq_length][ind])
+    image.save('tmp/sample_alb'..ind ..'.jpg', x[ind])
+end]]--
 
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
@@ -330,7 +275,10 @@ function feval(x_arg)
     end
     loss = loss / seq_length
     print(loss)
-
+	--[[for ind = 1, n_data do
+		image.save('tmp/sample_reconstruction_mnist'..ind ..'.jpg', x_prediction[seq_length][ind])
+		--image.save('tmp/sample_mnsit'..ind ..'.jpg', x[seq_length][ind])
+	end]]--
     ------------------ backward pass -------------------
     -- complete reverse order of the above
     dlstm_c_enc = {[seq_length] = torch.zeros(n_data, rnn_size)}
