@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/draw_conv_150_classes_cond.lua" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/plot_results_rgb.lua" afterPath="$PROJECT_DIR$/plot_results_rgb.lua" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,7 +25,7 @@
       <file leaf-file-name="draw_convolution_rgb.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1439">
+            <state relative-caret-position="1295">
               <caret line="398" column="40" lean-forward="false" selection-start-line="398" selection-start-column="40" selection-end-line="398" selection-end-column="40" />
               <folding>
                 <element signature="e#1474#1821#0" expanded="false" />
@@ -38,8 +40,8 @@
       <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="335" column="0" lean-forward="false" selection-start-line="335" selection-start-column="0" selection-end-line="335" selection-end-column="0" />
+            <state relative-caret-position="249">
+              <caret line="29" column="6" lean-forward="false" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
               <folding>
                 <element signature="e#8024#8499#0" expanded="false" />
               </folding>
@@ -47,11 +49,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="draw_convolution_cond.lua" pinned="false" current-in-tab="true">
+      <file leaf-file-name="draw_conv_150_classes_cond.lua" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/draw_conv_150_classes_cond.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1152">
+              <caret line="70" column="26" lean-forward="false" selection-start-line="70" selection-start-column="26" selection-end-line="70" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="txt_feat_test.lua" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/txt_feat_test.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1008">
+              <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="draw_convolution_cond.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_convolution_cond.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="788">
-              <caret line="177" column="0" lean-forward="false" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
+            <state relative-caret-position="3776">
+              <caret line="219" column="21" lean-forward="false" selection-start-line="219" selection-start-column="21" selection-end-line="219" selection-end-column="21" />
               <folding>
                 <element signature="e#7059#7444#0" expanded="false" />
               </folding>
@@ -62,8 +84,8 @@
       <file leaf-file-name="plot_results_rgb.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="28" lean-forward="false" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
+            <state relative-caret-position="198">
+              <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -73,7 +95,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>train</find>
       <find>test</find>
       <find>feval</find>
       <find>params</find>
@@ -103,6 +124,7 @@
       <find>sample</find>
       <find>patch</find>
       <find>prev_canvas</find>
+      <find>text</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -123,13 +145,15 @@
         <option value="$PROJECT_DIR$/draw_convolution_rgb.lua" />
         <option value="$PROJECT_DIR$/draw_conv_150_classes.lua" />
         <option value="$PROJECT_DIR$/draw_convolution_cond.lua" />
+        <option value="$PROJECT_DIR$/draw_conv_150_classes_cond.lua" />
         <option value="$PROJECT_DIR$/plot_results_rgb.lua" />
+        <option value="$PROJECT_DIR$/txt_feat_test.lua" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1951" />
-    <option name="y" value="31" />
+    <option name="x" value="1938" />
+    <option name="y" value="32" />
     <option name="width" value="1045" />
     <option name="height" value="1854" />
   </component>
@@ -380,7 +404,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1951" y="31" width="1045" height="1854" extended-state="0" />
+    <frame x="1938" y="32" width="1045" height="1854" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29913712" sideWeight="0.4962162" order="0" side_tool="false" content_ui="combo" />
@@ -545,9 +569,37 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/draw_conv_conditional.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4647">
+          <caret line="302" column="33" lean-forward="false" selection-start-line="302" selection-start-column="33" selection-end-line="302" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/draw_convolution_cond.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3776">
+          <caret line="219" column="21" lean-forward="false" selection-start-line="219" selection-start-column="21" selection-end-line="219" selection-end-column="21" />
+          <folding>
+            <element signature="e#7059#7444#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="249">
+          <caret line="29" column="6" lean-forward="false" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+          <folding>
+            <element signature="e#8024#8499#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1439">
+        <state relative-caret-position="1295">
           <caret line="398" column="40" lean-forward="false" selection-start-line="398" selection-start-column="40" selection-end-line="398" selection-end-column="40" />
           <folding>
             <element signature="e#1474#1821#0" expanded="false" />
@@ -558,39 +610,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_conv_conditional.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4647">
-          <caret line="302" column="33" lean-forward="false" selection-start-line="302" selection-start-column="33" selection-end-line="302" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="335" column="0" lean-forward="false" selection-start-line="335" selection-start-column="0" selection-end-line="335" selection-end-column="0" />
-          <folding>
-            <element signature="e#8024#8499#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="28" lean-forward="false" selection-start-line="0" selection-start-column="28" selection-end-line="0" selection-end-column="28" />
+        <state relative-caret-position="198">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_convolution_cond.lua">
+    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes_cond.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="788">
-          <caret line="177" column="0" lean-forward="false" selection-start-line="177" selection-start-column="0" selection-end-line="177" selection-end-column="0" />
-          <folding>
-            <element signature="e#7059#7444#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="1152">
+          <caret line="70" column="26" lean-forward="false" selection-start-line="70" selection-start-column="26" selection-end-line="70" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/txt_feat_test.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1008">
+          <caret line="56" column="13" lean-forward="false" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
