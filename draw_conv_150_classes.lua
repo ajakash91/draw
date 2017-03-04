@@ -15,12 +15,12 @@ require 'GaussianCriterion'
 Tensor = torch.CudaTensor
 
 -- number of classes and examples per class in a batch for training
-n_classes = 4
-n_samples = 10
+n_classes = 15
+n_samples = 20
 
 -- Network hyperparameters
 text_feat_size = 1024
-n_z = 200			--20    --400
+n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
 seq_length = 5		--50
 -- input image channels
@@ -296,10 +296,10 @@ function feval(x_arg)
     --print(loss)
     --print(mu_prediction[1]:size())
     print_count = print_count + 1
-    if print_count % 100 == 0 then
+    if print_count % 500 == 0 then
         for ind = 1, n_data do
-            image.save('tmp/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
-            image.save('tmp/sample_'..ind ..'.jpg', x[seq_length][ind])
+            image.save('tmp/1/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/1/sample_'..ind ..'.jpg', x[seq_length][ind])
         end
     end
 
@@ -355,8 +355,8 @@ train_losses = {}
 val_losses = {}
 
 for i = 1, 300000 do
-    if i % 30000 == 0 then
-        lr = lr / 1.9
+    if i % 100000 == 0 then
+        lr = lr / 2
         optim_state = {learningRate = lr}
     end
 
@@ -374,8 +374,8 @@ for i = 1, 300000 do
         local val_loss = 0
         val_losses[i] = val_loss
 
-        local savefile = string.format('output/chk_%d_%.5f_.t7', i, lr)
-        print('saving checkpoint to output/' .. savefile)
+        local savefile = string.format('output/1/chk_%d_%.5f_.t7', i, lr)
+        print('saving checkpoint to output/1/' .. savefile)
 
         local checkpoint = {}
         checkpoint.encoder = encoder

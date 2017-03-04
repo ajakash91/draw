@@ -9,7 +9,7 @@ local model_utils=require 'model_utils'
 local mnist = require 'mnist'
 nngraph.setDebug(true)
 
-x_prediction = torch.load('x_prediction')
+x_prediction = torch.load('t9/x_prediction')
 --x_prediction = torch.load('x_generation')
 
 --print(#x_prediction)
