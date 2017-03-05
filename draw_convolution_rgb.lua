@@ -10,6 +10,7 @@ require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
 
+--cutorch.setDevice(3)
 --nngraph.setDebug(true)
 
 Tensor = torch.CudaTensor
@@ -36,14 +37,17 @@ f1 = 5
 --f3 = 3
 final_width = torch.floor((A-f1)/2)+1
 
+alb_dir = '/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/'
+alb_dir2 = '/cs/vml1/users/aabdujyo/treeDraw/draw/001.Black_footed_Albatross/'
+
 function read_data()
 	-- Go over all files in directory. We use an iterator, paths.files().
 	local files = {}
-	for file in paths.files('/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/') do
+	for file in paths.files(alb_dir2) do
 		-- We only load files that match the extension
 		if file:find('.jpg' .. '$') then
 			-- and insert the ones we care about in our table
-			table.insert(files, paths.concat('/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/', file))
+			table.insert(files, paths.concat(alb_dir2, file))
 		end
 	end
 
