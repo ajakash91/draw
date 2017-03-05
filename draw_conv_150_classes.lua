@@ -86,6 +86,34 @@ function read_data()
     return image_features
 end
 
+function read_data_from_images()
+    -- List of random numbers to select from test set class (150 classes)
+    local file_rand = torch.randperm(150)--#file_list)
+
+    image_features = torch.zeros(n_data, n_channels, A, B)
+    --text_features = torch.zeros(n_data, 10, text_feat_size)
+
+    for i = 1, n_classes do
+        -- Read image and text data for all samples in the class
+        --print(file_list[file_rand[i]])
+        full_image_data = torch.load(file_list[file_rand[i]])
+        --text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
+        --full_text_data = torch.load(paths.concat(text_dir, text_file))
+
+        -- Read n_samples random samples from each class
+        sample_rand = torch.randperm(full_image_data:size(1))
+        for j = 1, n_samples do
+            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[sample_rand[j]]
+            --[[for k = 1, 10 do
+                text_features[{{(i-1)*n_samples+j}, {k}, {}}] = full_text_data['txt_fea'][(sample_rand[j]-1)*10 + k]
+            end]]--
+        end
+    end
+    --print(image_features:size())
+    --print(text_features:size())
+    return image_features
+end
+
 function enc_convolution(x)
 	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
 	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
