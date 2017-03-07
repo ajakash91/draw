@@ -10,7 +10,7 @@ require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
 
---cutorch.setDevice(3) -- Use 1 or 3 in server
+cutorch.setDevice(3) -- Use 1(1 in nvidia-smi), 3(2) or 4(3) in server
 --nngraph.setDebug(true)
 
 Tensor = torch.CudaTensor
@@ -35,7 +35,8 @@ o1 = 12
 f1 = 5
 --f2 = 3
 --f3 = 3
-final_width = torch.floor((A-f1)/2)+1
+--final_width = torch.floor((A-f1)/2)+1
+final_width = A-f1+1
 
 alb_dir = '/cs/vml4/Datasets/Caltech-UCSD-Birds-200/original_images/images/001.Black_footed_Albatross/'
 alb_dir2 = '/cs/vml1/users/aabdujyo/treeDraw/draw/001.Black_footed_Albatross/'
@@ -43,11 +44,11 @@ alb_dir2 = '/cs/vml1/users/aabdujyo/treeDraw/draw/001.Black_footed_Albatross/'
 function read_data()
 	-- Go over all files in directory. We use an iterator, paths.files().
 	local files = {}
-	for file in paths.files(alb_dir) do
+	for file in paths.files(alb_dir2) do
 		-- We only load files that match the extension
 		if file:find('.jpg' .. '$') then
 			-- and insert the ones we care about in our table
-			table.insert(files, paths.concat(alb_dir, file))
+			table.insert(files, paths.concat(alb_dir2, file))
 		end
 	end
 
@@ -80,7 +81,7 @@ end
 end]]--
 
 function enc_convolution(x)
-	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1, 2, 2)(x))
+	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x)) -- , 2, 2)(x))
 	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
 	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
 	layer3_flat = nn.View(o1*(final_width)*(final_width))(layer1)
@@ -94,7 +95,7 @@ function dec_convolution(next_h)
 	fc_1 = nn.ReLU()(fc_1)
 	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
 	--layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
-	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1, 2, 2, 0, 0, 1, 1)(fc_1)
+	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(fc_1)--, 2, 2, 0, 0, 1, 1)(fc_1)
 	return(layer_3)
 end
 

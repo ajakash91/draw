@@ -86,6 +86,34 @@ function read_data()
     return image_features
 end
 
+function read_data_from_images()
+    -- List of random numbers to select from test set class (150 classes)
+    local file_rand = torch.randperm(150)--#file_list)
+
+    image_features = torch.zeros(n_data, n_channels, A, B)
+    --text_features = torch.zeros(n_data, 10, text_feat_size)
+
+    for i = 1, n_classes do
+        -- Read image and text data for all samples in the class
+        --print(file_list[file_rand[i]])
+        full_image_data = torch.load(file_list[file_rand[i]])
+        --text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
+        --full_text_data = torch.load(paths.concat(text_dir, text_file))
+
+        -- Read n_samples random samples from each class
+        sample_rand = torch.randperm(full_image_data:size(1))
+        for j = 1, n_samples do
+            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[sample_rand[j]]
+            --[[for k = 1, 10 do
+                text_features[{{(i-1)*n_samples+j}, {k}, {}}] = full_text_data['txt_fea'][(sample_rand[j]-1)*10 + k]
+            end]]--
+        end
+    end
+    --print(image_features:size())
+    --print(text_features:size())
+    return image_features
+end
+
 function enc_convolution(x)
 	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
 	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
@@ -164,7 +192,7 @@ x = nn.Identity()()
 z = nn.Identity()()
 prev_h = nn.Identity()()
 prev_c = nn.Identity()()
---prev_canvas = nn.Identity()()
+prev_canvas = nn.Identity()()
 n_input = n_z
 input = z
 
@@ -194,9 +222,9 @@ sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
 
 --write layer end
 
---next_canvas = nn.CAddTable()({prev_canvas, mu_prediction})
+next_canvas = nn.CAddTable()({prev_canvas, mu_prediction})
 
---mu = nn.Sigmoid()(next_canvas)
+mu = nn.Sigmoid()(next_canvas)
 
 neg_mu = nn.MulConstant(-1)(mu_prediction)
 d = nn.CAddTable()({x, neg_mu})
@@ -206,7 +234,7 @@ sigma_prediction = nn.View(n_channels, A, B)(sigma_prediction)
 
 x_error = nn.View(n_channels, A, B)(d)
 
-decoder = nn.gModule({x, z, prev_c, prev_h}, {mu_prediction, sigma_prediction, x_error, next_c, next_h})
+decoder = nn.gModule({x, z, prev_c, prev_h, prev_canvas}, {mu_prediction, sigma_prediction, x_error, next_c, next_h, next_canvas})
 decoder = decoder:cuda()
 decoder.name = 'decoder'
 
@@ -242,10 +270,11 @@ function feval(x_arg)
     loss_z = {}
     loss_x = {}
     dx_prediction = {}
-    dmu_prediction = {}
+    --dmu_prediction = {}
+    dcanvas = {}
     dsigma_prediction = {}
 
-    --canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
+    canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
     x = {}
     --patch = {}
 
@@ -260,7 +289,7 @@ function feval(x_arg)
         lstm_h_dec[t-1] = lstm_h_dec[t-1]:cuda()
         lstm_c_dec[t-1] = lstm_c_dec[t-1]:cuda()
         x_error[t-1] = x_error[t-1]:cuda()
-        --canvas[t-1] = canvas[t-1]:cuda()
+        canvas[t-1] = canvas[t-1]:cuda()
         --ascending = ascending:cuda()
 
         z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}))
@@ -280,14 +309,16 @@ function feval(x_arg)
         print(encoder_clones[t]:size())
         print('encoder_clones:x')
         print(encoder_clones[t].x:size())]]--
-        mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t]= unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1]}))
+        mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t], canvas[t]= unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}))
 
-        x_prediction[t] = {mu_prediction[t], sigma_prediction[t] }
+        --*x_prediction[t] = {mu_prediction[t], sigma_prediction[t] }
+        x_prediction[t] = {canvas[t], sigma_prediction[t] }
 
         loss_x[t] = criterion:forward(x_prediction[t], x[t])
         dx_prediction[t] = criterion:backward(x_prediction[t], x[t])
 
-        dmu_prediction[t] = dx_prediction[t][1]
+        --*dmu_prediction[t] = dx_prediction[t][1]
+        dcanvas[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
 
         loss = loss + torch.mean(loss_z[t]) + (loss_x[t] / (n_channels * A * B)) -- torch.mean(loss_x[t])
@@ -299,7 +330,7 @@ function feval(x_arg)
     if print_count % 100 == 0 then
         start = torch.random(1, 140)
         for ind = 1, 20 do
-            image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', canvas[seq_length][ind]) --*
             image.save('tmp/1/tmpsample_'..ind ..'.jpg', x[seq_length][ind])
         end
     end
@@ -314,11 +345,13 @@ function feval(x_arg)
     dx_error = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
     --dx_prediction = {}
     dloss_z = {}
-    --dcanvas = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
+    --*dcanvas = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
+    dmu_prediction = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
     dz = {}
     dx1 = {}
     dx2 = {}
     de = {}
+    dcanvas1 = {}
     --dpatch = {}
 
     for t = seq_length,1,-1 do
@@ -330,12 +363,14 @@ function feval(x_arg)
         dx_error[t] = dx_error[t]:cuda()
         dlstm_c_dec[t] = dlstm_c_dec[t]:cuda()
         dlstm_h_dec[t] = dlstm_h_dec[t]:cuda()
-        --dcanvas[t] = dcanvas[t]:cuda()
+        --*dcanvas[t] = dcanvas[t]:cuda()
+        dmu_prediction[t] = dmu_prediction[t]:cuda()
 
         dlstm_c_enc[t] = dlstm_c_enc[t]:cuda()
         dlstm_h_enc[t] = dlstm_h_enc[t]:cuda()
 
-        dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1]= unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t]}))
+        --*dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1], dcanvas[t-1] = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t]}))
+        dmu_prediction[t-1], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1], dcanvas1[t] = unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1], canvas[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t], dcanvas[t]}))
         dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t] = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t]}))
     end
 

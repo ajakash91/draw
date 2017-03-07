@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/draw_conv_150_classes_canvas.lua" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Expt_parameters.ods" afterPath="$PROJECT_DIR$/Expt_parameters.ods" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.~lock.Expt_parameters.ods#" afterPath="$PROJECT_DIR$/.~lock.Expt_parameters.ods#" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conv_150_classes.lua" afterPath="$PROJECT_DIR$/draw_conv_150_classes.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_convolution_rgb.lua" afterPath="$PROJECT_DIR$/draw_convolution_rgb.lua" />
     </list>
@@ -21,29 +25,49 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="draw_convolution_rgb.lua" pinned="false" current-in-tab="true">
+      <file leaf-file-name="draw_convolution_rgb.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1293">
-              <caret line="384" column="0" lean-forward="true" selection-start-line="384" selection-start-column="0" selection-end-line="384" selection-end-column="0" />
+            <state relative-caret-position="-2898">
+              <caret line="31" column="7" lean-forward="false" selection-start-line="31" selection-start-column="7" selection-end-line="31" selection-end-column="7" />
               <folding>
-                <element signature="e#1533#1880#0" expanded="false" />
-                <element signature="e#5066#5464#0" expanded="false" />
-                <element signature="e#5805#5907#0" expanded="false" />
-                <element signature="e#8113#8498#0" expanded="false" />
+                <element signature="e#1582#1929#0" expanded="false" />
+                <element signature="e#5133#5531#0" expanded="false" />
+                <element signature="e#5872#5974#0" expanded="false" />
+                <element signature="e#8180#8565#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="false">
+      <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="400" column="43" lean-forward="false" selection-start-line="400" selection-start-column="43" selection-end-line="400" selection-end-column="43" />
+            <state relative-caret-position="1053">
+              <caret line="64" column="58" lean-forward="false" selection-start-line="64" selection-start-column="58" selection-end-line="64" selection-end-column="58" />
               <folding>
-                <element signature="e#9194#9669#0" expanded="false" />
+                <element signature="e#8034#8509#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="draw_conv_150_classes_canvas.lua" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/draw_conv_150_classes_canvas.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1260">
+              <caret line="70" column="67" lean-forward="false" selection-start-line="70" selection-start-column="67" selection-end-line="70" selection-end-column="67" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GaussianCriterion.lua" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="522">
+              <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -94,8 +118,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>test</find>
-      <find>feval</find>
       <find>params</find>
       <find>loss_x</find>
       <find>canvas</find>
@@ -124,6 +146,8 @@
       <find>patch</find>
       <find>prev_canvas</find>
       <find>text</find>
+      <find>start</find>
+      <find>dmu_prediction</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -146,15 +170,16 @@
         <option value="$PROJECT_DIR$/plot_results_rgb.lua" />
         <option value="$PROJECT_DIR$/txt_feat_test.lua" />
         <option value="$PROJECT_DIR$/draw_convolution_rgb.lua" />
+        <option value="$PROJECT_DIR$/draw_conv_150_classes_canvas.lua" />
         <option value="$PROJECT_DIR$/draw_conv_150_classes.lua" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1919" />
-    <option name="y" value="26" />
-    <option name="width" value="1082" />
-    <option name="height" value="1870" />
+    <option name="x" value="1938" />
+    <option name="y" value="39" />
+    <option name="width" value="1045" />
+    <option name="height" value="1851" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -403,7 +428,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1919" y="26" width="1082" height="1870" extended-state="6" />
+    <frame x="1938" y="39" width="1045" height="1851" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29913712" sideWeight="0.4962162" order="0" side_tool="false" content_ui="combo" />
@@ -523,14 +548,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="324">
-          <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/draw_conditional.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -610,25 +627,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
+    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="400" column="43" lean-forward="false" selection-start-line="400" selection-start-column="43" selection-end-line="400" selection-end-column="43" />
-          <folding>
-            <element signature="e#9194#9669#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="522">
+          <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/draw_convolution_rgb.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1293">
-          <caret line="384" column="0" lean-forward="true" selection-start-line="384" selection-start-column="0" selection-end-line="384" selection-end-column="0" />
+        <state relative-caret-position="-2898">
+          <caret line="31" column="7" lean-forward="false" selection-start-line="31" selection-start-column="7" selection-end-line="31" selection-end-column="7" />
           <folding>
-            <element signature="e#1533#1880#0" expanded="false" />
-            <element signature="e#5066#5464#0" expanded="false" />
-            <element signature="e#5805#5907#0" expanded="false" />
-            <element signature="e#8113#8498#0" expanded="false" />
+            <element signature="e#1582#1929#0" expanded="false" />
+            <element signature="e#5133#5531#0" expanded="false" />
+            <element signature="e#5872#5974#0" expanded="false" />
+            <element signature="e#8180#8565#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes_canvas.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1260">
+          <caret line="70" column="67" lean-forward="false" selection-start-line="70" selection-start-column="67" selection-end-line="70" selection-end-column="67" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1053">
+          <caret line="64" column="58" lean-forward="false" selection-start-line="64" selection-start-column="58" selection-end-line="64" selection-end-column="58" />
+          <folding>
+            <element signature="e#8034#8509#0" expanded="false" />
           </folding>
         </state>
       </provider>
