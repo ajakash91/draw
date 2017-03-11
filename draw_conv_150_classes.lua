@@ -15,14 +15,14 @@ require 'GaussianCriterion'
 Tensor = torch.CudaTensor
 
 -- number of classes and examples per class in a batch for training
-n_classes = 4
+n_classes = 1
 n_samples = 20
 
 -- Network hyperparameters
 text_feat_size = 1024
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 5		--50
+seq_length = 1		--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -60,7 +60,7 @@ table.sort(file_list, function (a,b) return a < b end)
 -- Select n_classes random classes and n_sample random images from each of those classes
 function read_data()
     -- List of random numbers to select from test set class (150 classes)
-    local file_rand = torch.randperm(n_classes)--(150)--#file_list)
+    local file_rand = torch.randperm(2)--(150)--#file_list)
 
     image_features = torch.zeros(n_data, n_channels, A, B)
     --text_features = torch.zeros(n_data, 10, text_feat_size)
@@ -107,12 +107,30 @@ function dec_convolution(next_h)
     return(layer_3)
 end
 
+function enc_linear(x)
+    x = nn.View(n_channels*A*B)(x)
+	layer1 = nn.ReLU()(nn.Linear(n_channels*A*B, 500)(x))
+	fc = nn.ReLU()(nn.Linear(500, rnn_size)(layer1))
+
+    return(fc)
+end
+
+function dec_linear(next_h)
+	fc_1 = nn.ReLU()(nn.Linear(rnn_size, 500)(next_h))
+	layer_3 = nn.Linear(500, n_channels*A*B)(fc_1)
+    layer_3 = nn.View(n_channels, A, B)(layer_3)
+
+    return(layer_3)
+end
+
 --encoder
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
-fc1 = enc_convolution(x)
-fc1_e = enc_convolution(x_error_prev)
+--fc1 = enc_convolution(x)
+--fc1_e = enc_convolution(x_error_prev)
+fc1 = enc_linear(x)
+fc1_e = enc_linear(x_error_prev)
 
 input = nn.JoinTable(1)({fc1, fc1_e})
 input = nn.View(rnn_size*2)(input)
@@ -189,8 +207,10 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
-mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
-sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
+--mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
+--sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
+mu_prediction = nn.Sigmoid()(dec_linear(next_h))
+sigma_prediction = nn.Sigmoid()(dec_linear(next_h))
 
 --write layer end
 
@@ -235,7 +255,7 @@ function feval(x_arg)
     lstm_h_dec = {[0]=torch.zeros(n_data, rnn_size)}
 
 
-    x_error = {[0]=torch.rand(n_data, n_channels, A, B)}
+    x_error = {[0]=torch.zeros(n_data, n_channels, A, B)}
     x_prediction = {}
     mu_prediction = {}
     sigma_prediction = {}
@@ -302,11 +322,12 @@ function feval(x_arg)
     losss_z = losss_z / seq_length
 
     loss = losss_x-- + losss_z
-    print(losss_x, losss_z)
+    --print(losss_x, losss_z)
     --print(mu_prediction[1]:size())
     print_count = print_count + 1
     if print_count % 100 == 0 then
         start = torch.random(1, 140)
+        print(losss_x, losss_z)
         for ind = 1, 20 do
             image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
             image.save('tmp/1/tmpsample_'..ind ..'.jpg', x[seq_length][ind])
@@ -365,7 +386,7 @@ train_losses = {}
 val_losses = {}
 
 for i = 1, 300000 do
-    if i % 2000 == 0 then
+    if i % 5000 == 0 then
         lr = lr / 2
         optim_state = {learningRate = lr}
     end

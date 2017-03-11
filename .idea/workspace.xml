@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/draw_conv_with_Sampler.lua" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/sample" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GaussianCriterion.lua" afterPath="$PROJECT_DIR$/GaussianCriterion.lua" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conv_150_classes.lua" afterPath="$PROJECT_DIR$/draw_conv_150_classes.lua" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conv_with_Sampler.lua" afterPath="$PROJECT_DIR$/draw_conv_with_Sampler.lua" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,13 +21,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="false">
+      <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="65">
-              <caret line="245" column="26" lean-forward="false" selection-start-line="245" selection-start-column="26" selection-end-line="245" selection-end-column="26" />
+            <state relative-caret-position="1278">
+              <caret line="77" column="80" lean-forward="false" selection-start-line="77" selection-start-column="80" selection-end-line="77" selection-end-column="80" />
               <folding>
-                <element signature="e#8092#8567#0" expanded="false" />
+                <element signature="e#8634#9109#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -39,18 +36,18 @@
       <file leaf-file-name="draw_conv_with_Sampler.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/draw_conv_with_Sampler.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2016">
-              <caret line="112" column="30" lean-forward="false" selection-start-line="112" selection-start-column="30" selection-end-line="112" selection-end-column="30" />
+            <state relative-caret-position="1188">
+              <caret line="113" column="0" lean-forward="false" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Sampler.lua" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Sampler.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Sampler.lua">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="648">
-              <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -59,18 +56,8 @@
       <file leaf-file-name="txt_feat_test.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/txt_feat_test.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1224">
-              <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="plot_results_rgb.lua" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="198">
-              <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+            <state relative-caret-position="1152">
+              <caret line="64" column="31" lean-forward="false" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -80,9 +67,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>features</find>
-      <find>x_error</find>
-      <find>table</find>
       <find>arrow</find>
       <find>sigma_predic</find>
       <find>x_pre</find>
@@ -98,7 +82,6 @@
       <find>img_fea</find>
       <find>read_da</find>
       <find>text_dir</find>
-      <find>print</find>
       <find>image.sa</find>
       <find>read_data</find>
       <find>sample</find>
@@ -110,6 +93,10 @@
       <find>params</find>
       <find>n_z</find>
       <find>e =</find>
+      <find>e =</find>
+      <find>400</find>
+      <find>n_data</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -133,9 +120,9 @@
         <option value="$PROJECT_DIR$/draw_convolution_rgb.lua" />
         <option value="$PROJECT_DIR$/draw_conv_150_classes_canvas.lua" />
         <option value="$PROJECT_DIR$/GaussianCriterion.lua" />
-        <option value="$PROJECT_DIR$/draw_conv_150_classes.lua" />
         <option value="$PROJECT_DIR$/Sampler.lua" />
         <option value="$PROJECT_DIR$/draw_conv_with_Sampler.lua" />
+        <option value="$PROJECT_DIR$/draw_conv_150_classes.lua" />
       </list>
     </option>
   </component>
@@ -596,6 +583,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Sampler.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="648">
+          <caret line="36" column="0" lean-forward="false" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/plot_results_rgb.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
@@ -606,43 +609,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/txt_feat_test.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1224">
-          <caret line="68" column="0" lean-forward="false" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+        <state relative-caret-position="1152">
+          <caret line="64" column="31" lean-forward="false" selection-start-line="64" selection-start-column="31" selection-end-line="64" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
+    <entry file="file://$PROJECT_DIR$/draw_conv_with_Sampler.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+        <state relative-caret-position="1188">
+          <caret line="113" column="0" lean-forward="false" selection-start-line="113" selection-start-column="0" selection-end-line="113" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="65">
-          <caret line="245" column="26" lean-forward="false" selection-start-line="245" selection-start-column="26" selection-end-line="245" selection-end-column="26" />
+        <state relative-caret-position="1278">
+          <caret line="77" column="80" lean-forward="false" selection-start-line="77" selection-start-column="80" selection-end-line="77" selection-end-column="80" />
           <folding>
-            <element signature="e#8092#8567#0" expanded="false" />
+            <element signature="e#8634#9109#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/draw_conv_with_Sampler.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2016">
-          <caret line="112" column="30" lean-forward="false" selection-start-line="112" selection-start-column="30" selection-end-line="112" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Sampler.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="648">
-          <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>

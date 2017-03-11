@@ -23,7 +23,7 @@ n_samples = 20
 text_feat_size = 1024
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 5		--50
+seq_length = 1		--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -306,7 +306,7 @@ function feval(x_arg)
     --losss_z = losss_z / seq_length
 
     loss = losss_x-- + losss_z
-    print(losss_x)--, losss_z)
+    --print(losss_x)--, losss_z)
     --print(mu_prediction[1]:size())
     print_count = print_count + 1
     if print_count % 100 == 0 then
@@ -369,7 +369,7 @@ train_losses = {}
 val_losses = {}
 
 for i = 1, 300000 do
-    if i % 2000 == 0 then
+    if i % 500 == 0 then
         lr = lr / 2
         optim_state = {learningRate = lr}
     end
