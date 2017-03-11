@@ -9,6 +9,7 @@ local model_utils=require 'model_utils'
 require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
+require 'Sampler'
 
 --nngraph.setDebug(true)
 
@@ -142,20 +143,23 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 mu = nn.Linear(rnn_size, n_z)(next_h)
 sigma = nn.Linear(rnn_size, n_z)(next_h)
-sigma = nn.Exp()(sigma)
+--sigma = nn.Exp()(sigma)
 
-e = nn.Identity()()
+--[[e = nn.Identity()()
 sigma_e = nn.CMulTable()({sigma, e})
-z = nn.CAddTable()({mu, sigma_e})
-mu_squared = nn.Square()(mu)
+z = nn.CAddTable()({mu, sigma_e})]]--
+
+z = nn.Sampler()({mu, sigma})
+
+--[[mu_squared = nn.Square()(mu)
 sigma_squared = nn.Square()(sigma)
 log_sigma_sq = nn.Log()(sigma_squared)
 minus_log_sigma = nn.MulConstant(-1)(log_sigma_sq)
 loss_z = nn.CAddTable()({mu_squared, sigma_squared, minus_log_sigma})
 loss_z = nn.AddConstant(-1)(loss_z)
 loss_z = nn.MulConstant(0.5)(loss_z)
-loss_z = nn.Sum(2)(loss_z)
-encoder = nn.gModule({x, x_error_prev, prev_c, prev_h, e}, {z, loss_z, next_c, next_h})
+loss_z = nn.Sum(2)(loss_z)]]--
+encoder = nn.gModule({x, x_error_prev, prev_c, prev_h}, {z, next_c, next_h})
 encoder = encoder:cuda()
 encoder.name = 'encoder'
 
@@ -239,7 +243,7 @@ function feval(x_arg)
     x_prediction = {}
     mu_prediction = {}
     sigma_prediction = {}
-    loss_z = {}
+    --loss_z = {}
     loss_x = {}
     dx_prediction = {}
     dmu_prediction = {}
@@ -250,11 +254,11 @@ function feval(x_arg)
     --patch = {}
 
     local loss = 0
-    local losss_z = 0
+    --local losss_z = 0
     local losss_x = 0
 
     for t = 1, seq_length do
-        e[t] = torch.randn(n_data, n_z):cuda()
+        --e[t] = torch.randn(n_data, n_z):cuda()
         x[t] = img_features_input:cuda()
 
         lstm_h_enc[t-1] = lstm_h_enc[t-1]:cuda()
@@ -265,7 +269,7 @@ function feval(x_arg)
         --canvas[t-1] = canvas[t-1]:cuda()
         --ascending = ascending:cuda()
 
-        z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}))
+        z[t], lstm_c_enc[t], lstm_h_enc[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1]}))
         --[[print('z')
         print(z[t]:size())
         print('loss_z')
@@ -295,21 +299,21 @@ function feval(x_arg)
         dsigma_prediction[t] = dx_prediction[t][2]
 
         --loss = loss + torch.mean(loss_z[t]) + (loss_x[t] / (n_channels * A * B)) -- torch.mean(loss_x[t])
-        losss_z = losss_z + torch.mean(loss_z[t])
+        --losss_z = losss_z + torch.mean(loss_z[t])
         losss_x = losss_x + loss_x[t] / (n_channels * A * B)
     end
     losss_x = losss_x / seq_length
-    losss_z = losss_z / seq_length
+    --losss_z = losss_z / seq_length
 
     loss = losss_x-- + losss_z
-    print(losss_x, losss_z)
+    print(losss_x)--, losss_z)
     --print(mu_prediction[1]:size())
     print_count = print_count + 1
     if print_count % 100 == 0 then
         start = torch.random(1, 140)
         for ind = 1, 20 do
-            image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
-            image.save('tmp/1/tmpsample_'..ind ..'.jpg', x[seq_length][ind])
+            image.save('tmp/1/tmpsample_reconstruction__'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/1/tmpsample__'..ind ..'.jpg', x[seq_length][ind])
         end
     end
 
@@ -322,7 +326,7 @@ function feval(x_arg)
 
     dx_error = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
     --dx_prediction = {}
-    dloss_z = {}
+    --dloss_z = {}
     --dcanvas = {[seq_length] = torch.zeros(n_data, n_channels, A, B)}
     dz = {}
     dx1 = {}
@@ -332,7 +336,7 @@ function feval(x_arg)
 
     for t = seq_length,1,-1 do
         --dloss_x[t] = torch.ones(n_data, 1):cuda()
-        dloss_z[t] = torch.ones(n_data, 1):cuda()
+        --dloss_z[t] = torch.ones(n_data, 1):cuda()
         --dx_prediction[t] = torch.zeros(n_data, n_channels, A, B):cuda()
         --dpatch[t] = torch.zeros(n_data, N, N):cuda()
 
@@ -345,7 +349,7 @@ function feval(x_arg)
         dlstm_h_enc[t] = dlstm_h_enc[t]:cuda()
 
         dx1[t], dz[t], dlstm_c_dec[t-1], dlstm_h_dec[t-1]= unpack(decoder_clones[t]:backward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1]}, {dmu_prediction[t], dsigma_prediction[t], dx_error[t], dlstm_c_dec[t], dlstm_h_dec[t]}))
-        dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1], de[t] = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}, {dz[t], dloss_z[t], dlstm_c_enc[t], dlstm_h_enc[t]}))
+        dx2[t], dx_error[t-1], dlstm_c_enc[t-1], dlstm_h_enc[t-1] = unpack(encoder_clones[t]:backward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1]}, {dz[t], dlstm_c_enc[t], dlstm_h_enc[t]}))
     end
 
     -- clip gradient element-wise
