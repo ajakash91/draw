@@ -22,7 +22,7 @@ n_samples = 20
 text_feat_size = 1024
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 1		--50
+seq_length = 3   	--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -60,7 +60,7 @@ table.sort(file_list, function (a,b) return a < b end)
 -- Select n_classes random classes and n_sample random images from each of those classes
 function read_data()
     -- List of random numbers to select from test set class (150 classes)
-    local file_rand = torch.randperm(2)--(150)--#file_list)
+    local file_rand = torch.randperm(n_classes)--(150)--#file_list)
 
     image_features = torch.zeros(n_data, n_channels, A, B)
     --text_features = torch.zeros(n_data, 10, text_feat_size)
@@ -75,7 +75,7 @@ function read_data()
         -- Read n_samples random samples from each class
         sample_rand = torch.randperm(n_samples)--full_image_data:size(1))
         for j = 1, n_samples do
-            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[sample_rand[j]]
+            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[j]--sample_rand[j]]
             --[[for k = 1, 10 do
                 text_features[{{(i-1)*n_samples+j}, {k}, {}}] = full_text_data['txt_fea'][(sample_rand[j]-1)*10 + k]
             end]]--
@@ -127,10 +127,10 @@ end
 x = nn.Identity()()
 x_error_prev = nn.Identity()()
 
---fc1 = enc_convolution(x)
---fc1_e = enc_convolution(x_error_prev)
-fc1 = enc_linear(x)
-fc1_e = enc_linear(x_error_prev)
+fc1 = enc_convolution(x)
+fc1_e = enc_convolution(x_error_prev)
+--fc1 = enc_linear(x)
+--fc1_e = enc_linear(x_error_prev)
 
 input = nn.JoinTable(1)({fc1, fc1_e})
 input = nn.View(rnn_size*2)(input)
@@ -207,10 +207,10 @@ next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
 
 -- write layer
---mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
---sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
-mu_prediction = nn.Sigmoid()(dec_linear(next_h))
-sigma_prediction = nn.Sigmoid()(dec_linear(next_h))
+mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
+sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
+--mu_prediction = nn.Sigmoid()(dec_linear(next_h))
+--sigma_prediction = nn.Sigmoid()(dec_linear(next_h))
 
 --write layer end
 
@@ -255,15 +255,26 @@ function feval(x_arg)
     lstm_h_dec = {[0]=torch.zeros(n_data, rnn_size)}
 
 
-    x_error = {[0]=torch.zeros(n_data, n_channels, A, B)}
-    x_prediction = {}
+    x_error = {[0]=torch.rand(n_data, n_channels, A, B)}
+    mu_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
+    sigma_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
+    x_prediction = {[0]={mu_prediction[0], sigma_prediction[0]}}
+    loss_z = {}
+    for i = 1, seq_length do
+        loss_z[i] = torch.zeros(n_data, 1)
+    end
+    loss_x = {[0]=torch.zeros(n_data, 1)}
+    dx_prediction = {}
+    dmu_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
+    dsigma_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
+    --[[x_prediction = {}
     mu_prediction = {}
     sigma_prediction = {}
     loss_z = {}
     loss_x = {}
     dx_prediction = {}
     dmu_prediction = {}
-    dsigma_prediction = {}
+    dsigma_prediction = {}]]--
 
     --canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
     x = {}
@@ -286,22 +297,7 @@ function feval(x_arg)
         --ascending = ascending:cuda()
 
         z[t], loss_z[t], lstm_c_enc[t], lstm_h_enc[t] = unpack(encoder_clones[t]:forward({x[t], x_error[t-1], lstm_c_enc[t-1], lstm_h_enc[t-1], e[t]}))
-        --[[print('z')
-        print(z[t]:size())
-        print('loss_z')
-        print(loss_z[t]:size())
-        print('lstm_c_enc')
-        print(lstm_c_enc[t]:size())
-        print('lstm_h_enc')
-        print(lstm_h_enc[t]:size())
-        print('patch')
-        print(patch[t]:size())
-        print('x')
-        print(x[t]:size())
-        print('encoder_clones')
-        print(encoder_clones[t]:size())
-        print('encoder_clones:x')
-        print(encoder_clones[t].x:size())]]--
+
         mu_prediction[t], sigma_prediction[t], x_error[t], lstm_c_dec[t], lstm_h_dec[t]= unpack(decoder_clones[t]:forward({x[t], z[t], lstm_c_dec[t-1], lstm_h_dec[t-1]}))
 
         --ln_sigma_prediction[t] = math.log(sigma_prediction[t]:pow(2))
@@ -313,6 +309,38 @@ function feval(x_arg)
 
         dmu_prediction[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
+
+
+        --[[print('z')
+        print(z[t]:size())
+        print('loss_z')
+        print(loss_z[t]:size())
+        print('lstm_c_enc')
+        print(lstm_c_enc[t]:size())
+        print('lstm_h_enc')
+        print(lstm_h_enc[t]:size())
+        print('loss_z')
+        print(loss_z[t]:size())
+        print('x')
+        print(x[t]:size())
+        print('x_error')
+        print(x_error[t]:size())
+        print('e')
+        print(e[t]:size())
+        print('mu_prediction')
+        print(mu_prediction[t]:size())
+        print('sigma_prediction')
+        print(sigma_prediction[t]:size())
+        print('lstm_c_dec')
+        print(lstm_c_dec[t]:size())
+        print('x_prediction')
+        print(#x_prediction[t])
+        print('dx_prediction')
+        print(#dx_prediction[t])
+        print('dmu_prediction')
+        print(dmu_prediction[t]:size())
+        print('loss_x')
+        print(loss_x[t])]]--
 
         --loss = loss + torch.mean(loss_z[t]) + (loss_x[t] / (n_channels * A * B)) -- torch.mean(loss_x[t])
         losss_z = losss_z + torch.mean(loss_z[t])

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a507de61-a0c6-438d-9c67-0d20cd66d055" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conv_150_classes.lua" afterPath="$PROJECT_DIR$/draw_conv_150_classes.lua" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draw_conv_with_Sampler.lua" afterPath="$PROJECT_DIR$/draw_conv_with_Sampler.lua" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,11 +24,19 @@
       <file leaf-file-name="draw_conv_150_classes.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1278">
-              <caret line="77" column="80" lean-forward="false" selection-start-line="77" selection-start-column="80" selection-end-line="77" selection-end-column="80" />
-              <folding>
-                <element signature="e#8634#9109#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="124">
+              <caret line="271" column="22" lean-forward="false" selection-start-line="271" selection-start-column="22" selection-end-line="271" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GaussianCriterion.lua" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="504">
+              <caret line="28" column="3" lean-forward="false" selection-start-line="28" selection-start-column="3" selection-end-line="28" selection-end-column="3" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -67,7 +75,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>arrow</find>
       <find>sigma_predic</find>
       <find>x_pre</find>
       <find>*2</find>
@@ -93,10 +100,10 @@
       <find>params</find>
       <find>n_z</find>
       <find>e =</find>
-      <find>e =</find>
       <find>400</find>
       <find>n_data</find>
       <find>print</find>
+      <find>enc_l</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -122,6 +129,7 @@
         <option value="$PROJECT_DIR$/GaussianCriterion.lua" />
         <option value="$PROJECT_DIR$/Sampler.lua" />
         <option value="$PROJECT_DIR$/draw_conv_with_Sampler.lua" />
+        <option value="$PROJECT_DIR$/draw_conv_150_classes2.lua" />
         <option value="$PROJECT_DIR$/draw_conv_150_classes.lua" />
       </list>
     </option>
@@ -379,7 +387,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1938" y="39" width="1045" height="1851" extended-state="0" />
+    <frame x="1938" y="39" width="1045" height="1851" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.29913712" sideWeight="0.4962162" order="0" side_tool="false" content_ui="combo" />
@@ -583,14 +591,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="162">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Sampler.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="648">
@@ -623,13 +623,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/draw_conv_150_classes2.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="31" lean-forward="false" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GaussianCriterion.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="504">
+          <caret line="28" column="3" lean-forward="false" selection-start-line="28" selection-start-column="3" selection-end-line="28" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/draw_conv_150_classes.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1278">
-          <caret line="77" column="80" lean-forward="false" selection-start-line="77" selection-start-column="80" selection-end-line="77" selection-end-column="80" />
-          <folding>
-            <element signature="e#8634#9109#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="124">
+          <caret line="271" column="22" lean-forward="false" selection-start-line="271" selection-start-column="22" selection-end-line="271" selection-end-column="22" />
+          <folding />
         </state>
       </provider>
     </entry>
