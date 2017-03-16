@@ -22,7 +22,7 @@ n_samples = 20
 text_feat_size = 1024
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 3   	--50
+seq_length = 5   	--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -75,7 +75,7 @@ function read_data()
         -- Read n_samples random samples from each class
         sample_rand = torch.randperm(n_samples)--full_image_data:size(1))
         for j = 1, n_samples do
-            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[j]--sample_rand[j]]
+            image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[sample_rand[j]]
             --[[for k = 1, 10 do
                 text_features[{{(i-1)*n_samples+j}, {k}, {}}] = full_text_data['txt_fea'][(sample_rand[j]-1)*10 + k]
             end]]--
@@ -357,8 +357,8 @@ function feval(x_arg)
         start = torch.random(1, 140)
         print(losss_x, losss_z)
         for ind = 1, 20 do
-            image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
-            image.save('tmp/1/tmpsample_'..ind ..'.jpg', x[seq_length][ind])
+            image.save('tmp/1/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/1/sample_'..ind ..'.jpg', x[seq_length][ind])
         end
     end
 
@@ -419,7 +419,7 @@ for i = 1, 300000 do
         optim_state = {learningRate = lr}
     end
 
-    local _, loss = optim.adam(feval, params, optim_state)
+    local _, loss = optim.adamax(feval, params, optim_state)
     local train_loss = loss[1]
     train_losses[i] = train_loss
 

@@ -267,14 +267,6 @@ function feval(x_arg)
     dx_prediction = {}
     dmu_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
     dsigma_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
-    --[[x_prediction = {}
-    mu_prediction = {}
-    sigma_prediction = {}
-    loss_z = {}
-    loss_x = {}
-    dx_prediction = {}
-    dmu_prediction = {}
-    dsigma_prediction = {}]]--
 
     --canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
     x = {}
