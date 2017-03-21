@@ -9,6 +9,7 @@ local model_utils=require 'model_utils'
 require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
+--dbg = require 'debugger.lua'
 
 --nngraph.setDebug(true)
 
@@ -22,7 +23,7 @@ n_samples = 20
 text_feat_size = 1024
 n_z = 100			--20    --400
 rnn_size = 256		--100   --1024
-seq_length = 3   	--50
+seq_length = 5   	--50
 -- input image channels
 n_channels = 3
 --N = 15				--3
@@ -32,6 +33,7 @@ A = 32
 B = 32
 n_data = n_classes*n_samples
 n_canvas = A*B
+normalization = 'batch-norm' -- 'batch-norm', 'weight-norm', or 'none'
 
 o1 = 12
 --o2 = 32
@@ -68,12 +70,13 @@ function read_data()
     for i = 1, n_classes do
         -- Read image and text data for all samples in the class
         --print(file_list[file_rand[i]])
-        full_image_data = torch.load(file_list[i])--file_rand[i]])
+        full_image_data = torch.load(file_list[file_rand[i]])
         --text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
         --full_text_data = torch.load(paths.concat(text_dir, text_file))
 
         -- Read n_samples random samples from each class
         sample_rand = torch.randperm(n_samples)--full_image_data:size(1))
+        --sample_rand = torch.range(n_samples)--full_image_data:size(1))
         for j = 1, n_samples do
             image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[j]--sample_rand[j]]
             --[[for k = 1, 10 do
@@ -86,8 +89,39 @@ function read_data()
     return image_features
 end
 
+function LSTM_old(inp, pr_h, pr_c, n_in, n_rnn)
+    local function new_input_sum()
+    -- transforms input
+    --local i2h            = nn.BatchNormalization(n_rnn)(nn.Linear(n_in, n_rnn)(inp))
+    local i2h            = nn.Linear(n_in, n_rnn)(inp)
+    -- transforms previous timestep's output
+    --local h2h            = nn.BatchNormalization(n_rnn)(nn.Linear(n_rnn, n_rnn)(pr_h))
+    local h2h            = nn.Linear(n_rnn, n_rnn)(pr_h)
+    return nn.CAddTable()({i2h, h2h})
+    end
+
+    local in_gate          = nn.Sigmoid()(new_input_sum())
+    local forget_gate      = nn.Sigmoid()(new_input_sum())
+    local out_gate         = nn.Sigmoid()(new_input_sum())
+    local in_transform     = nn.Tanh()(new_input_sum())
+
+    nx_c           = nn.CAddTable()({
+        nn.CMulTable()({forget_gate, pr_c}),
+        nn.CMulTable()({in_gate,     in_transform})
+    })
+    nx_h           = nn.CMulTable()({out_gate, nn.Tanh()(nx_c)})
+
+    return nx_c, nx_h
+end
+
 function enc_convolution(x)
-	layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
+    if normalization == 'batch-norm' then
+        layer1 = nn.ReLU()(nn.SpatialBatchNormalization(o1)(nn.SpatialConvolution(n_channels, o1, f1, f1)(x)))
+    elseif normalization == 'weight-norm' then
+        --local weight_norm =
+    else
+        layer1 = nn.ReLU()(nn.SpatialConvolution(n_channels, o1, f1, f1)(x))
+    end
 	--layer2 = nn.ReLU()(nn.SpatialConvolution(o1, o2, f2, f2)(layer1))
 	--layer3 = nn.ReLU()(nn.SpatialConvolution(o2, o3, f3, f3)(layer2))
 	layer3_flat = nn.View(o1*(final_width)*(final_width))(layer1)
@@ -97,12 +131,19 @@ function enc_convolution(x)
 end
 
 function dec_convolution(next_h)
-	fc_1 = nn.Linear(rnn_size, o1*(final_width)*(final_width))(next_h)
-	fc_1 = nn.View(o1, (final_width), (final_width))(fc_1)
+    if normalization == 'batch-norm' then
+        fc_1 = nn.BatchNormalization(o1*(final_width)*(final_width))(nn.Linear(rnn_size, o1*(final_width)*(final_width))(next_h))
+	elseif normalization == 'weight-norm' then
+        --a=decoder
+    else
+        fc_1 = nn.Linear(rnn_size, o1*(final_width)*(final_width))(next_h)
+    end
+
+    fc_1 = nn.View(o1, (final_width), (final_width))(fc_1)
 	fc_1 = nn.ReLU()(fc_1)
 	--layer_1 = nn.ReLU()(nn.SpatialFullConvolution(o3, o2, f3, f3)(fc_1))
 	--layer_2 = nn.ReLU()(nn.SpatialFullConvolution(o2, o1, f2, f2)(fc_1))
-	layer_3 = nn.SpatialFullConvolution(o1, n_channels, f1, f1)(fc_1)
+	layer_3 = nn.Sigmoid()(nn.SpatialFullConvolution(o1, n_channels, f1, f1)(fc_1))
 
     return(layer_3)
 end
@@ -118,7 +159,7 @@ end
 function dec_linear(next_h)
 	fc_1 = nn.ReLU()(nn.Linear(rnn_size, 500)(next_h))
 	layer_3 = nn.Linear(500, n_channels*A*B)(fc_1)
-    layer_3 = nn.View(n_channels, A, B)(layer_3)
+    layer_3 = nn.Sigmoid()(nn.View(n_channels, A, B)(layer_3))
 
     return(layer_3)
 end
@@ -139,24 +180,7 @@ n_input = rnn_size*2
 prev_h = nn.Identity()()
 prev_c = nn.Identity()()
 
-function new_input_sum()
-    -- transforms input
-    i2h            = nn.Linear(n_input, rnn_size)(input)
-    -- transforms previous timestep's output
-    h2h            = nn.Linear(rnn_size, rnn_size)(prev_h)
-    return nn.CAddTable()({i2h, h2h})
-end
-
-in_gate          = nn.Sigmoid()(new_input_sum())
-forget_gate      = nn.Sigmoid()(new_input_sum())
-out_gate         = nn.Sigmoid()(new_input_sum())
-in_transform     = nn.Tanh()(new_input_sum())
-
-next_c           = nn.CAddTable()({
-    nn.CMulTable()({forget_gate, prev_c}),
-    nn.CMulTable()({in_gate,     in_transform})
-})
-next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
+next_c, next_h = LSTM_old(input, prev_h, prev_c, n_input, rnn_size)
 
 mu = nn.Linear(rnn_size, n_z)(next_h)
 sigma = nn.Linear(rnn_size, n_z)(next_h)
@@ -186,31 +210,13 @@ prev_c = nn.Identity()()
 n_input = n_z
 input = z
 
-function new_input_sum()
-    -- transforms input
-    i2h            = nn.Linear(n_input, rnn_size)(input)
-    -- transforms previous timestep's output
-    h2h            = nn.Linear(rnn_size, rnn_size)(prev_h)
-    return nn.CAddTable()({i2h, h2h})
-end
-
-in_gate          = nn.Sigmoid()(new_input_sum())
-forget_gate      = nn.Sigmoid()(new_input_sum())
-out_gate         = nn.Sigmoid()(new_input_sum())
-in_transform     = nn.Tanh()(new_input_sum())
-
-next_c           = nn.CAddTable()({
-    nn.CMulTable()({forget_gate, prev_c}),
-    nn.CMulTable()({in_gate,     in_transform})
-})
-next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
-
+next_c, next_h = LSTM_old(input, prev_h, prev_c, n_input, rnn_size)
 
 -- write layer
-mu_prediction = nn.Sigmoid()(dec_convolution(next_h))
-sigma_prediction = nn.Sigmoid()(dec_convolution(next_h))
---mu_prediction = nn.Sigmoid()(dec_linear(next_h))
---sigma_prediction = nn.Sigmoid()(dec_linear(next_h))
+mu_prediction = dec_convolution(next_h)
+sigma_prediction = dec_convolution(next_h)
+--mu_prediction = dec_linear(next_h)
+--sigma_prediction = dec_linear(next_h)
 
 --write layer end
 
@@ -241,6 +247,7 @@ print_count = 0
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
     -- Read images
+    img_features_input = {}
     img_features_input = read_data()
 
     if x_arg ~= params then
@@ -256,17 +263,14 @@ function feval(x_arg)
 
 
     x_error = {[0]=torch.rand(n_data, n_channels, A, B)}
-    mu_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
-    sigma_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
-    x_prediction = {[0]={mu_prediction[0], sigma_prediction[0]}}
+    x_prediction = {}
+    mu_prediction = {}
+    sigma_prediction = {}
     loss_z = {}
-    for i = 1, seq_length do
-        loss_z[i] = torch.zeros(n_data, 1)
-    end
-    loss_x = {[0]=torch.zeros(n_data, 1)}
+    loss_x = {}
     dx_prediction = {}
-    dmu_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
-    dsigma_prediction = {[0]=torch.zeros(n_data, n_channels, A, B)}
+    dmu_prediction = {}
+    dsigma_prediction = {}
 
     --canvas = {[0]=torch.rand(n_data, n_channels, A, B)}
     x = {}
@@ -301,7 +305,6 @@ function feval(x_arg)
 
         dmu_prediction[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
-
 
         --[[print('z')
         print(z[t]:size())
@@ -341,16 +344,16 @@ function feval(x_arg)
     losss_x = losss_x / seq_length
     losss_z = losss_z / seq_length
 
-    loss = losss_x-- + losss_z
+    loss = losss_x + losss_z
     --print(losss_x, losss_z)
     --print(mu_prediction[1]:size())
     print_count = print_count + 1
     if print_count % 100 == 0 then
         start = torch.random(1, 140)
         print(losss_x, losss_z)
-        for ind = 1, 20 do
-            image.save('tmp/1/tmpsample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
-            image.save('tmp/1/tmpsample_'..ind ..'.jpg', x[seq_length][ind])
+        for ind = 1, n_classes*n_samples do
+            image.save('tmp/1/sample_reconstruction_'..ind ..'.jpg', mu_prediction[seq_length][ind])
+            image.save('tmp/1/sample_'..ind ..'.jpg', x[seq_length][ind])
         end
     end
 

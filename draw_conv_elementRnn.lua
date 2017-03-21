@@ -1,3 +1,4 @@
+-- NEED TO MODIFY
 --require 'mobdebug'.start()
 
 require 'nn'
@@ -9,6 +10,8 @@ local model_utils=require 'model_utils'
 require 'cutorch'
 require 'cunn'
 require 'GaussianCriterion'
+--dbg = require 'debugger.lua'
+require 'rnn'
 
 --nngraph.setDebug(true)
 
@@ -16,7 +19,7 @@ require 'GaussianCriterion'
 
 -- number of classes and examples per class in a batch for training
 n_classes = 1
-n_samples = 10
+n_samples = 20
 
 -- Network hyperparameters
 text_feat_size = 1024
@@ -69,12 +72,13 @@ function read_data()
     for i = 1, n_classes do
         -- Read image and text data for all samples in the class
         --print(file_list[file_rand[i]])
-        full_image_data = torch.load(file_list[i])--file_rand[i]])
+        full_image_data = torch.load(file_list[file_rand[i]])
         --text_file = string.match(file_list[file_rand[i]], '%d%d%d%..*%.t7')
         --full_text_data = torch.load(paths.concat(text_dir, text_file))
 
         -- Read n_samples random samples from each class
         sample_rand = torch.randperm(n_samples)--full_image_data:size(1))
+        --sample_rand = torch.range(n_samples)--full_image_data:size(1))
         for j = 1, n_samples do
             image_features[{{(i-1)*n_samples+j}, {}, {}, {}}] = full_image_data[j]--sample_rand[j]]
             --[[for k = 1, 10 do
@@ -87,7 +91,7 @@ function read_data()
     return image_features
 end
 
-function LSTM(inp, pr_h, pr_c, n_in, n_rnn)
+function LSTM_old(inp, pr_h, pr_c, n_in, n_rnn)
     local function new_input_sum()
     -- transforms input
     --local i2h            = nn.BatchNormalization(n_rnn)(nn.Linear(n_in, n_rnn)(inp))
@@ -178,7 +182,7 @@ n_input = rnn_size*2
 prev_h = nn.Identity()()
 prev_c = nn.Identity()()
 
-next_c, next_h = LSTM(input, prev_h, prev_c, n_input, rnn_size)
+next_c, next_h = LSTM_old(input, prev_h, prev_c, n_input, rnn_size)
 
 mu = nn.Linear(rnn_size, n_z)(next_h)
 sigma = nn.Linear(rnn_size, n_z)(next_h)
@@ -208,7 +212,7 @@ prev_c = nn.Identity()()
 n_input = n_z
 input = z
 
-next_c, next_h = LSTM(input, prev_h, prev_c, n_input, rnn_size)
+next_c, next_h = LSTM_old(input, prev_h, prev_c, n_input, rnn_size)
 
 -- write layer
 mu_prediction = dec_convolution(next_h)
@@ -245,6 +249,7 @@ print_count = 0
 -- do fwd/bwd and return loss, grad_params
 function feval(x_arg)
     -- Read images
+    img_features_input = {}
     img_features_input = read_data()
 
     if x_arg ~= params then
@@ -302,7 +307,6 @@ function feval(x_arg)
 
         dmu_prediction[t] = dx_prediction[t][1]
         dsigma_prediction[t] = dx_prediction[t][2]
-
 
         --[[print('z')
         print(z[t]:size())
